@@ -2,21 +2,23 @@
 @plugin "daisyui";
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: #000;
+  background: #000000;
 }
-
+@theme {
+  --color-sec: #7ed967;
+  --color-prime: #ffc56d;
+}
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
 .bg-zaza {
-  background-image: linear-gradient(to right, #7ed967, #ffc56d);
+  background-image: linear-gradient(to right, #ffc56d, #7ed967);
   background-size: 200% auto;
   transition: background-position 0.3s ease;
 }
-
-.bg-zaza:hover {
+sss .bg-zaza:hover {
   background-position: right center;
 }
 

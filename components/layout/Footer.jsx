@@ -1,10 +1,16 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isDashboard = pathname?.startsWith("/dashboard");
+
+  if (isDashboard) return null; // 👈 Skip rendering if in dashboard
   return (
     <footer className="p-16 bg-black text-white bg-gradient-to-bl from-black  to-[#0d1b10]">
       <div className="container mx-auto px-4 py-12">
@@ -115,10 +121,7 @@ export default function Footer() {
                 placeholder="Your email"
                 className="bg-gray-800 border-gray-700 text-white"
               />
-              <Button
-                type="submit"
-                className="cursor-pointer bg-gradient-to-r from-[#7ED957] to-[#28a745] hover:opacity-90 text-white shadow-md"
-              >
+              <Button type="submit" variant="prime">
                 Subscribe
               </Button>
             </div>

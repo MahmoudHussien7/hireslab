@@ -39,10 +39,7 @@ export default function Newsletter() {
                 <span>Email Address</span>
               </label>
             </div>
-            <Button
-              type="submit"
-              className="bg-gradient-to-r from-[#7ED957] to-[#28a745] hover:opacity-90 text-white shadow-md"
-            >
+            <Button type="submit" variant="prime">
               Subscribe
             </Button>
           </form>
