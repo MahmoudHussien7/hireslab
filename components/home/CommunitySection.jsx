@@ -60,11 +60,7 @@ export default function CommunitySection() {
               </div>
             </motion.div>
 
-            <Button
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-[#7ED967] to-[#28A745] hover:from-[#6CC65F] hover:to-[#218838] text-white shadow-md"
-            >
+            <Button asChild size="lg" variant="prime">
               <Link href="/community">Join Now</Link>
             </Button>
           </div>

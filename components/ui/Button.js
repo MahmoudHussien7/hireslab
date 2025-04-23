@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         prime:
-          "bg-gradient-to-r from-[#7ED967] to-[#28A745] hover:from-[#6CC65F] hover:to-[#218838] text-white shadow-md",
+          "bg-gradient-to-r from-[#ffdba1] to-[#ffc56d] hover:from-[#ffc56d] hover:to-[#ffdba1] text-white shadow-md",
         default: "bg-[#7ED967] text-black hover:bg-[#7ED967]/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
