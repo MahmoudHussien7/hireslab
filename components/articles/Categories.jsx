@@ -62,10 +62,11 @@ export default function Categories({ articles, onCategorySelect }) {
                 </p>
                 <button
                   onClick={() => onCategorySelect(category.name)}
-                  className="inline-flex items-center text-[#7ED967] hover:text-[#7ED967]/80 transition-colors"
+                  className="cta-link inline-flex items-center relative transition-all"
                   aria-label={`Explore ${category.name} articles`}
                 >
-                  Explore <ArrowRight className="ml-2 h-4 w-4" />
+                  <span className="cta-text">Explore</span>
+                  <ArrowRight className="cta-icon ml-2 h-4 w-4" />
                 </button>
               </div>
             </motion.div>

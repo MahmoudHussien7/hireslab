@@ -16,7 +16,7 @@ export default function ArticlesHero() {
           className="max-w-4xl mx-auto"
         >
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-            <span className="hires-gradient-text">Insights</span> & Articles
+            <span className="hires-gradient-text">Contact</span> US
           </h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -31,18 +31,7 @@ export default function ArticlesHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Link
-              href="#articles"
-              className="relative overflow-hidden custom-hover inline-flex items-center px-6 py-3 bg-[#7ed967] text-black rounded-full transition-colors text-lg font-medium"
-              aria-label="Browse all articles"
-            >
-              <span className="relative z-10 transition-colors duration-400">
-                Browse All Articles
-              </span>
-              <ArrowRight className="ml-2 h-5 w-5 relative z-10 transition-colors duration-400" />
-            </Link>
-          </motion.div>
+          ></motion.div>
         </motion.div>
       </div>
     </section>
