@@ -13,12 +13,91 @@ body {
     text-wrap: balance;
   }
 }
+.custom-hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 120%;
+  height: 100%;
+  background: #ffc56d;
+  transform: skew(30deg);
+  z-index: 0;
+  transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+
+.custom-hover:hover::before {
+  transform: translate3d(100%, 0, 0);
+}
+
+.custom-hover:hover span {
+  color: black; /* already your base color, but keep if you plan to invert */
+}
+.cta-link {
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.cta-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50px;
+  background: #f9e7cd; /* light version of #7ED967 */
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  z-index: 0;
+}
+
+.cta-text {
+  position: relative;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #ffc56d;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.cta-icon {
+  position: relative;
+  transform: translateX(-5px);
+  stroke: #ffc56d;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.cta-link:hover::before {
+  width: 100%;
+  background: #e1fbe8; /* same light hover */
+}
+
+.cta-link:hover .cta-icon {
+  transform: translateX(0);
+}
+
+.cta-link:active {
+  transform: scale(0.95);
+}
+
 .bg-zaza {
   background-image: linear-gradient(to right, #ffc56d, #7ed967);
   background-size: 200% auto;
   transition: background-position 0.3s ease;
 }
-sss .bg-zaza:hover {
+.bg-zaza:hover {
   background-position: right center;
 }
 

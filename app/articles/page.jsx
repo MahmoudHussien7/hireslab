@@ -90,7 +90,7 @@ export default function ArticlesPage() {
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="bg-black min-h-screen">
       {/* Spacer for fixed header */}
       <div className="h-20 md:h-24" />
       <Hero />

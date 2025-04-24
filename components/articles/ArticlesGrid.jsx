@@ -66,10 +66,11 @@ export default function ArticlesGrid({ articles, searchQuery }) {
                     </div>
                     <Link
                       href={`/articles/${article.id}`}
-                      className="inline-flex items-center text-[#7ED967] hover:text-[#7ED967]/80 transition-colors"
+                      className="cta-link inline-flex items-center relative transition-all"
                       aria-label={`Read ${article.title}`}
                     >
-                      Read More <ArrowRight className="ml-2 h-4 w-4" />
+                      <span className="cta-text">Read More</span>
+                      <ArrowRight className="cta-icon ml-2 h-4 w-4" />
                     </Link>
                   </div>
                 </div>
