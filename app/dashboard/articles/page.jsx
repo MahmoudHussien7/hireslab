@@ -1,13 +1,12 @@
-// page.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import {
   Plus,
   Search,
   Filter,
-  ArrowUpDown,
   MoreHorizontal,
   Eye,
   Edit,
@@ -38,100 +37,78 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { fetchArticles, deleteArticle } from "@/redux/slices/blogSlice";
 
-// Sample articles data
-const articles = [
-  {
-    id: 1,
-    title: "The Future of Remote Work in HR Management",
-    status: "Published",
-    category: "Trends",
-    date: "June 15, 2023",
-    views: 1245,
-  },
-  {
-    id: 2,
-    title: "Building Inclusive Recruitment Strategies",
-    status: "Published",
-    category: "Recruitment",
-    date: "May 28, 2023",
-    views: 982,
-  },
-  {
-    id: 3,
-    title: "Employee Retention: Beyond Compensation",
-    status: "Draft",
-    category: "Talent Management",
-    date: "In progress",
-    views: 0,
-  },
-  {
-    id: 4,
-    title: "The Impact of AI on HR Processes",
-    status: "Published",
-    category: "Technology",
-    date: "March 22, 2023",
-    views: 1567,
-  },
-  {
-    id: 5,
-    title: "Creating Effective Employee Development Programs",
-    status: "Published",
-    category: "Training",
-    date: "February 18, 2023",
-    views: 1089,
-  },
-  {
-    id: 6,
-    title: "Navigating HR Compliance in 2023",
-    status: "Draft",
-    category: "Compliance",
-    date: "In progress",
-    views: 0,
-  },
-  {
-    id: 7,
-    title: "The Role of HR in Company Culture",
-    status: "Published",
-    category: "Culture",
-    date: "January 10, 2023",
-    views: 1356,
-  },
-  {
-    id: 8,
-    title: "Effective Onboarding Strategies for Remote Teams",
-    status: "Published",
-    category: "Recruitment",
-    date: "December 5, 2022",
-    views: 1678,
-  },
-];
+function stripHtmlAndTruncate(htmlString, maxLength) {
+  const plainText = htmlString.replace(/<[^>]+>/g, "");
+  return plainText.length > maxLength
+    ? plainText.slice(0, maxLength) + "..."
+    : plainText;
+}
+
+function generateSlug(text) {
+  return text
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
+}
 
 export default function ArticlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Filter articles based on search term and filters
-  const filteredArticles = articles.filter((article) => {
-    const matchesSearch = article.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" ||
-      article.status.toLowerCase() === statusFilter.toLowerCase();
-    const matchesCategory =
-      categoryFilter === "all" ||
-      article.category.toLowerCase() === categoryFilter.toLowerCase();
+  const dispatch = useDispatch();
+  const { articles, loading, error } = useSelector((state) => state.blog);
+  const [hasFetched, setHasFetched] = useState(false);
 
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+  useEffect(() => {
+    if (!hasFetched) {
+      setHasFetched(true);
+      dispatch(fetchArticles());
+    }
+  }, [dispatch, hasFetched]);
 
-  // Get unique categories for filter
   const categories = [
     "all",
-    ...new Set(articles.map((article) => article.category.toLowerCase())),
+    ...new Set(
+      (articles || [])
+        .map((article) => article.category?.toLowerCase())
+        .filter(Boolean)
+    ),
   ];
+
+  const filteredArticles = (articles || [])
+    .filter((article) => {
+      const matchesSearch =
+        searchTerm === "" ||
+        article.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || article.status === statusFilter;
+      const matchesCategory =
+        categoryFilter === "all" ||
+        article.category?.toLowerCase() === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
+    })
+    .map((article) => ({
+      id: article._id,
+      title: article.name,
+      excerpt: article.excerpt || stripHtmlAndTruncate(article.content, 100),
+      coverImage: article.image,
+      category: article.category || "General",
+      author: article.writer ? article.writer.name : "Unknown Author",
+      date: article.date,
+      createdAt: article.createdAt,
+      views: article.views || 0,
+      status: article.status,
+      slug: generateSlug(article.name),
+    }));
+
+  const handleDelete = (id) => {
+    if (confirm("Are you sure you want to delete this article?")) {
+      dispatch(deleteArticle(id));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -168,7 +145,6 @@ export default function ArticlesPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
             <div className="flex flex-col gap-4 sm:flex-row">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
@@ -201,7 +177,11 @@ export default function ArticlesPage() {
             </div>
           </div>
 
-          {filteredArticles.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-10">Loading articles...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-10">Error: {error}</div>
+          ) : filteredArticles.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No articles found</h3>
@@ -215,35 +195,11 @@ export default function ArticlesPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b text-left">
-                    <th className="pb-3 font-medium">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="font-medium -ml-3"
-                      >
-                        Title <ArrowUpDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </th>
+                    <th className="pb-3 font-medium">Title</th>
                     <th className="pb-3 font-medium">Status</th>
                     <th className="pb-3 font-medium">Category</th>
-                    <th className="pb-3 font-medium">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="font-medium -ml-3"
-                      >
-                        Date <ArrowUpDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </th>
-                    <th className="pb-3 font-medium text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="font-medium -mr-3"
-                      >
-                        Views <ArrowUpDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </th>
+                    <th className="pb-3 font-medium">Date</th>
+                    <th className="pb-3 font-medium text-right">Views</th>
                     <th className="pb-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
@@ -254,17 +210,20 @@ export default function ArticlesPage() {
                       <td className="py-3">
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            article.status === "Published"
+                            article.status === "published"
                               ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                               : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
                           }`}
                         >
-                          {article.status}
+                          {article.status
+                            ? article.status.charAt(0).toUpperCase() +
+                              article.status.slice(1)
+                            : "Unknown"}
                         </span>
                       </td>
                       <td className="py-3">{article.category}</td>
                       <td className="py-3 text-muted-foreground">
-                        {article.date}
+                        {new Date(article.createdAt).toLocaleDateString()}
                       </td>
                       <td className="py-3 text-right">
                         {article.views.toLocaleString()}
@@ -282,7 +241,7 @@ export default function ArticlesPage() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/blog/${article.id}`}
+                                href={`/blog/${article.slug}`}
                                 className="flex items-center"
                               >
                                 <Eye className="mr-2 h-4 w-4" /> View
@@ -297,7 +256,10 @@ export default function ArticlesPage() {
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(article.id)}
+                              className="text-red-600 focus:text-red-600"
+                            >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

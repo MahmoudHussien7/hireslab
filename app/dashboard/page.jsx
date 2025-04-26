@@ -1,5 +1,9 @@
-// page.jsx
+"use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchArticles } from "@/redux/slices/blogSlice";
 import {
   BarChart3,
   Users,
@@ -21,7 +25,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Sample data for dashboard
+// Sample dashboard stats (still mock for now)
 const stats = [
   {
     title: "Total Articles",
@@ -53,47 +57,14 @@ const stats = [
   },
 ];
 
-// Sample recent articles
-const recentArticles = [
-  {
-    id: 1,
-    title: "The Future of Remote Work in HR Management",
-    status: "Published",
-    date: "June 15, 2023",
-    views: 1245,
-    likes: 87,
-    comments: 23,
-  },
-  {
-    id: 2,
-    title: "Building Inclusive Recruitment Strategies",
-    status: "Published",
-    date: "May 28, 2023",
-    views: 982,
-    likes: 64,
-    comments: 18,
-  },
-  {
-    id: 3,
-    title: "Employee Retention: Beyond Compensation",
-    status: "Draft",
-    date: "In progress",
-    views: 0,
-    likes: 0,
-    comments: 0,
-  },
-  {
-    id: 4,
-    title: "The Impact of AI on HR Processes",
-    status: "Published",
-    date: "March 22, 2023",
-    views: 1567,
-    likes: 112,
-    comments: 34,
-  },
-];
-
 export default function DashboardPage() {
+  const dispatch = useDispatch();
+  const { articles, loading, error } = useSelector((state) => state.blog);
+
+  useEffect(() => {
+    dispatch(fetchArticles());
+  }, [dispatch]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -143,6 +114,7 @@ export default function DashboardPage() {
           <TabsTrigger value="articles">Recent Articles</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
+
         <TabsContent value="articles" className="space-y-4">
           <Card>
             <CardHeader>
@@ -151,66 +123,84 @@ export default function DashboardPage() {
                 Overview of your recently published and drafted articles.
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pb-3 font-medium">Title</th>
-                      <th className="pb-3 font-medium">Status</th>
-                      <th className="pb-3 font-medium">Date</th>
-                      <th className="pb-3 font-medium text-right">Views</th>
-                      <th className="pb-3 font-medium text-right">
-                        Engagement
-                      </th>
-                      <th className="pb-3 font-medium text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentArticles.map((article) => (
-                      <tr key={article.id} className="border-b">
-                        <td className="py-3">{article.title}</td>
-                        <td className="py-3">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              article.status === "Published"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                            }`}
-                          >
-                            {article.status}
-                          </span>
-                        </td>
-                        <td className="py-3 text-muted-foreground">
-                          {article.date}
-                        </td>
-                        <td className="py-3 text-right">
-                          {article.views.toLocaleString()}
-                        </td>
-                        <td className="py-3 text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            <span className="flex items-center text-muted-foreground">
-                              <ThumbsUp className="mr-1 h-3 w-3" />{" "}
-                              {article.likes}
-                            </span>
-                            <span className="flex items-center text-muted-foreground">
-                              <MessageSquare className="mr-1 h-3 w-3" />{" "}
-                              {article.comments}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3 text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/dashboard/articles/${article.id}`}>
-                              Edit
-                            </Link>
-                          </Button>
-                        </td>
+                {loading ? (
+                  <div className="py-10 text-center text-muted-foreground">
+                    Loading articles...
+                  </div>
+                ) : error ? (
+                  <div className="py-10 text-center text-red-500">
+                    Error loading articles: {error}
+                  </div>
+                ) : articles.length === 0 ? (
+                  <div className="py-10 text-center text-muted-foreground">
+                    No articles found.
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b text-left">
+                        <th className="pb-3 font-medium">Title</th>
+                        <th className="pb-3 font-medium">Status</th>
+                        <th className="pb-3 font-medium">Date</th>
+                        <th className="pb-3 font-medium text-right">Views</th>
+                        <th className="pb-3 font-medium text-right">
+                          Engagement
+                        </th>
+                        <th className="pb-3 font-medium text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {articles.map((article) => (
+                        <tr key={article._id} className="border-b">
+                          <td className="py-3">{article.title}</td>
+                          <td className="py-3">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                article.status === "Published"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                              }`}
+                            >
+                              {article.status}
+                            </span>
+                          </td>
+                          <td className="py-3 text-muted-foreground">
+                            {article.createdAt
+                              ? new Date(article.createdAt).toLocaleDateString()
+                              : "N/A"}
+                          </td>
+                          <td className="py-3 text-right">
+                            {article.views?.toLocaleString() ?? 0}
+                          </td>
+                          <td className="py-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <span className="flex items-center text-muted-foreground">
+                                <ThumbsUp className="mr-1 h-3 w-3" />
+                                {article.likes ?? 0}
+                              </span>
+                              <span className="flex items-center text-muted-foreground">
+                                <MessageSquare className="mr-1 h-3 w-3" />
+                                {article.comments ?? 0}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 text-right">
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link href={`/dashboard/articles/${article._id}`}>
+                                Edit
+                              </Link>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
+
               <div className="mt-4 flex justify-end">
                 <Button variant="outline" asChild>
                   <Link href="/dashboard/articles">View All Articles</Link>
@@ -219,6 +209,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="analytics">
           <Card>
             <CardHeader>
