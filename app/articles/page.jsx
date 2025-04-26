@@ -1,85 +1,82 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Hero from "@/components/articles/ArticlesHero";
 import SearchFilter from "@/components/articles/SearchFilter";
-import FeaturedArticle from "@/components/articles//FeaturedArticles";
+import FeaturedArticle from "@/components/articles/FeaturedArticles";
 import ArticlesGrid from "@/components/articles/ArticlesGrid";
-import Categories from "@/components/articles//Categories";
+import Categories from "@/components/articles/Categories";
 import Newsletter from "@/components/home/Newsletter";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchArticles } from "@/redux/slices/blogSlice";
+
+// Utility function to generate a slug from the article name
+const generateSlug = (name) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+};
+
+// Utility function to strip HTML tags and truncate text
+const stripHtmlAndTruncate = (html, maxLength = 100) => {
+  const text = html.replace(/<[^>]*>/g, ""); // Remove HTML tags
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
 
 export default function ArticlesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState("");
   const filterRef = useRef(null);
 
-  const articles = [
-    {
-      id: 1,
-      title: "The Future of Remote Work",
-      excerpt:
-        "Explore how remote work is reshaping the modern workplace and what it means for employers and employees.",
-      author: "Jane Smith",
-      date: "May 15, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "Workplace Trends",
-    },
-    {
-      id: 2,
-      title: "Hiring Trends in 2023",
-      excerpt:
-        "Discover the latest hiring trends and how they're impacting recruitment strategies across industries.",
-      author: "John Davis",
-      date: "June 22, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "Recruitment",
-    },
-    {
-      id: 3,
-      title: "Building an Effective Onboarding Process",
-      excerpt:
-        "Learn how to create an onboarding process that sets new hires up for success and improves retention.",
-      author: "Sarah Johnson",
-      date: "July 10, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "HR Strategy",
-    },
-    {
-      id: 4,
-      title: "Employee Retention Strategies",
-      excerpt:
-        "Explore proven strategies to improve employee retention and reduce turnover in your organization.",
-      author: "Michael Brown",
-      date: "August 5, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "HR Strategy",
-    },
-    {
-      id: 5,
-      title: "Diversity and Inclusion in the Workplace",
-      excerpt:
-        "Understand the importance of diversity and inclusion and how to implement effective D&I initiatives.",
-      author: "Lisa Chen",
-      date: "September 18, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "Workplace Culture",
-    },
-    {
-      id: 6,
-      title: "The Impact of AI on Recruitment",
-      excerpt:
-        "Explore how artificial intelligence is transforming the recruitment process and what it means for HR professionals.",
-      author: "David Wilson",
-      date: "October 3, 2023",
-      image: "/placeholder.svg?height=400&width=600",
-      category: "Technology",
-    },
-  ];
+  const dispatch = useDispatch();
+  const { articles, loading, error } = useSelector((state) => state.blog);
+  const [hasFetched, setHasFetched] = useState(false);
 
-  const handleSubscribe = (e) => {
+  useEffect(() => {
+    if (!hasFetched) {
+      setHasFetched(true);
+      dispatch(fetchArticles());
+    }
+  }, [dispatch, hasFetched]);
+
+  // Map API data to the expected format for all components
+  const mappedArticles = articles.map((article) => ({
+    id: article._id,
+    title: article.name,
+    excerpt: article.excerpt || stripHtmlAndTruncate(article.content, 100), // Use excerpt or strip HTML from content
+    coverImage: article.image,
+    category:
+      article.category ||
+      (article.writer?.about?.includes("technology")
+        ? "Technology"
+        : "General"),
+    author: article.writer
+      ? { name: article.writer.name }
+      : { name: "Unknown Author" },
+    date: article.date,
+    slug: generateSlug(article.name),
+  }));
+
+  const handleSubscribe = (e, email) => {
     e.preventDefault();
-    setIsSubscribed(true);
-    setTimeout(() => setIsSubscribed(false), 3000);
+    let error = "";
+
+    if (!email) {
+      error = "Email is required.";
+    } else if (email.length < 5) {
+      error = "Email must be at least 5 characters.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      error = "Please enter a valid email address.";
+    }
+
+    setSubscriptionError(error);
+
+    if (!error) {
+      setIsSubscribed(true);
+      setTimeout(() => setIsSubscribed(false), 3000);
+    }
   };
 
   const handleCategorySelect = (category) => {
@@ -89,24 +86,48 @@ export default function ArticlesPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="bg-black min-h-screen flex items-center justify-center">
+        <div className="h-20 md:h-24" />
+        <p className="text-white text-lg">Loading articles...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-black min-h-screen flex items-center justify-center">
+        <div className="h-20 md:h-24" />
+        <p className="text-red-400 text-lg">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black min-h-screen">
-      {/* Spacer for fixed header */}
       <div className="h-20 md:h-24" />
       <Hero />
-
-      <FeaturedArticle />
+      <FeaturedArticle articles={mappedArticles} />
       <SearchFilter
         filterRef={filterRef}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        articles={articles}
+        articles={mappedArticles}
       />
-      <ArticlesGrid articles={articles} searchQuery={searchQuery} />
-      <Categories articles={articles} onCategorySelect={handleCategorySelect} />
+      <ArticlesGrid
+        articles={mappedArticles}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <Categories
+        articles={mappedArticles}
+        onCategorySelect={handleCategorySelect}
+      />
       <Newsletter
         isSubscribed={isSubscribed}
         handleSubscribe={handleSubscribe}
+        subscriptionError={subscriptionError}
       />
     </div>
   );

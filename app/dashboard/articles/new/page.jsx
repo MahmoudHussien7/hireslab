@@ -1,9 +1,10 @@
-// page.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Save, X, ImageIcon, LinkIcon } from "lucide-react";
+import { Save, X, ImageIcon, Link as LinkIcon, Palette } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +18,13 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import LinkExtension from "@tiptap/extension-link";
+import ImageExtension from "@tiptap/extension-image";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import { createArticle } from "@/redux/slices/blogSlice";
 
 // Sample categories
 const categories = [
@@ -29,17 +37,250 @@ const categories = [
   "Culture",
 ];
 
+// Utility function to estimate reading time
+const estimateReadingTime = (content) => {
+  const wordsPerMinute = 200; // Average reading speed
+  const text = content.replace(/<[^>]*>/g, ""); // Strip HTML tags
+  const words = text.trim().split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
+};
+
+// Custom Toolbar Component for TipTap
+const Toolbar = ({ editor }) => {
+  const linkInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+
+  if (!editor) return null;
+
+  const setLink = () => {
+    const url = prompt("Enter the URL:");
+    if (url === null) return;
+    if (url === "") {
+      editor.chain().focus().unsetLink().run();
+    } else {
+      editor.chain().focus().setLink({ href: url }).run();
+    }
+  };
+
+  const addImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Mock image upload (replace with actual upload logic)
+      const imageUrl = "/images/uploaded-content-image.jpg"; // Replace with actual URL
+      editor.chain().focus().setImage({ src: imageUrl }).run();
+    }
+  };
+
+  const setColor = (color) => {
+    editor.chain().focus().setColor(color).run();
+    setColorPickerOpen(false);
+  };
+
+  return (
+    <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-md">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={
+          editor.isActive("bold") ? "bg-gray-200 dark:bg-gray-600" : ""
+        }
+      >
+        <span className="font-bold">B</span>
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={
+          editor.isActive("italic") ? "bg-gray-200 dark:bg-gray-600" : ""
+        }
+      >
+        <span className="italic">I</span>
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={
+          editor.isActive("heading", { level: 1 })
+            ? "bg-gray-200 dark:bg-gray-600"
+            : ""
+        }
+      >
+        H1
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={
+          editor.isActive("heading", { level: 2 })
+            ? "bg-gray-200 dark:bg-gray-600"
+            : ""
+        }
+      >
+        H2
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={
+          editor.isActive("bulletList") ? "bg-gray-200 dark:bg-gray-600" : ""
+        }
+      >
+        <span className="text-sm">•</span>
+      </Button>
+      <Button type="button" variant="ghost" size="icon" onClick={setLink}>
+        <LinkIcon className="h-4 w-4" />
+      </Button>
+      <Button type="button" variant="ghost" size="icon" as="label">
+        <ImageIcon className="h-4 w-4" />
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          ref={imageInputRef}
+          onChange={addImage}
+        />
+      </Button>
+      <div className="relative">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setColorPickerOpen(!colorPickerOpen)}
+        >
+          <Palette className="h-4 w-4" />
+        </Button>
+        {colorPickerOpen && (
+          <div className="absolute z-10 mt-2 p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg">
+            <div className="flex gap-2">
+              {["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"].map(
+                (color) => (
+                  <button
+                    key={color}
+                    onClick={() => setColor(color)}
+                    className="w-6 h-6 rounded-full border border-gray-300"
+                    style={{ backgroundColor: color }}
+                  />
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() =>
+          editor.chain().focus().unsetAllMarks().clearNodes().run()
+        }
+      >
+        <span className="text-sm">Clear</span>
+      </Button>
+    </div>
+  );
+};
+
 export default function NewArticlePage() {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("draft");
+  const [excerpt, setExcerpt] = useState("");
+  const [tags, setTags] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { loading, error } = useSelector((state) => state.blog);
+
+  // Initialize TipTap Editor
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      LinkExtension.configure({
+        openOnClick: false,
+        autolink: true,
+      }),
+      ImageExtension.configure({
+        inline: true,
+      }),
+      TextStyle,
+      Color,
+    ],
+    content: "", // Initial content
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      // Update content state (you can also store it in Redux if needed)
+    },
+  });
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real application, you would save the article to your database
-    console.log({ title, content, category, status });
-    alert("Article saved successfully!");
+
+    // Mock image upload (replace with actual upload logic)
+    let imageUrl = "";
+    if (imageFile) {
+      imageUrl = "/images/uploaded-image.jpg"; // Replace with actual uploaded URL
+    }
+
+    // Get content from TipTap editor
+    const content = editor ? editor.getHTML() : "";
+
+    // Generate excerpt if not provided
+    const generatedExcerpt =
+      excerpt || content.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
+
+    // Prepare article data for the API
+    const articleData = {
+      name: title,
+      content, // HTML content from TipTap
+      writer: {
+        name: "John Smith", // Hardcoded for now
+        image: "https://example.com/images/writers/john.jpg",
+        about: "John is a technology journalist.",
+      },
+      date: new Date().toISOString(),
+      readingTime: estimateReadingTime(content),
+      image: imageUrl || "/placeholder.svg?height=400&width=600",
+      category: category.toLowerCase(),
+      status,
+      excerpt: generatedExcerpt,
+      tags: tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag),
+    };
+
+    try {
+      const result = await dispatch(createArticle(articleData)).unwrap();
+      router.push("/dashboard/articles");
+    } catch (err) {
+      console.error("Failed to create article:", err);
+    }
   };
 
   return (
@@ -52,16 +293,23 @@ export default function NewArticlePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild disabled={loading}>
             <Link href="/dashboard/articles">
               <X className="mr-2 h-4 w-4" /> Cancel
             </Link>
           </Button>
-          <Button onClick={handleSubmit}>
-            <Save className="mr-2 h-4 w-4" /> Save Article
+          <Button onClick={handleSubmit} disabled={loading}>
+            <Save className="mr-2 h-4 w-4" />{" "}
+            {loading ? "Saving..." : "Save Article"}
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-100 text-red-700 p-4 rounded-md">
+          Error: {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
@@ -113,10 +361,24 @@ export default function NewArticlePage() {
                 <Label htmlFor="featured-image">Featured Image</Label>
                 <div className="flex items-center gap-4">
                   <div className="h-32 w-32 rounded-md border border-dashed border-border flex items-center justify-center bg-muted">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Featured image preview"
+                        className="h-full w-full object-cover rounded-md"
+                      />
+                    ) : (
+                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                    )}
                   </div>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="outline" as="label">
                     Upload Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
                   </Button>
                 </div>
               </div>
@@ -130,39 +392,23 @@ export default function NewArticlePage() {
                   </TabsList>
                   <TabsContent value="write" className="mt-2">
                     <div className="border rounded-md">
-                      <div className="flex items-center gap-1 border-b p-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                        >
-                          <LinkIcon className="h-4 w-4" />
-                          <span className="sr-only">Insert link</span>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                        >
-                          <ImageIcon className="h-4 w-4" />
-                          <span className="sr-only">Insert image</span>
-                        </Button>
-                      </div>
-                      <Textarea
+                      <Toolbar editor={editor} />
+                      <EditorContent
+                        editor={editor}
+                        className="prose dark:prose-invert max-w-none p-4 min-h-[300px] bg-white dark:bg-gray-800 text-black dark:text-white border-t-0"
                         placeholder="Write your article content here..."
-                        className="min-h-[300px] border-0 focus-visible:ring-0"
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
                       />
                     </div>
                   </TabsContent>
                   <TabsContent value="preview" className="mt-2">
                     <div className="rounded-md border p-4 min-h-[300px]">
-                      {content ? (
+                      {editor && editor.getHTML() !== "<p></p>" ? (
                         <div className="prose dark:prose-invert max-w-none">
-                          {content}
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: editor.getHTML(),
+                            }}
+                          />
                         </div>
                       ) : (
                         <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -180,6 +426,8 @@ export default function NewArticlePage() {
                   id="excerpt"
                   placeholder="Write a short excerpt for your article"
                   className="h-24"
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground">
                   This will be displayed on the blog listing page. If left
@@ -189,7 +437,12 @@ export default function NewArticlePage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="tags">Tags</Label>
-                <Input id="tags" placeholder="Enter tags separated by commas" />
+                <Input
+                  id="tags"
+                  placeholder="Enter tags separated by commas"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                />
                 <p className="text-sm text-muted-foreground">
                   Tags help users find related content.
                 </p>
@@ -199,10 +452,12 @@ export default function NewArticlePage() {
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild disabled={loading}>
             <Link href="/dashboard/articles">Cancel</Link>
           </Button>
-          <Button type="submit">Save Article</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save Article"}
+          </Button>
         </div>
       </form>
     </div>

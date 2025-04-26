@@ -1,24 +1,34 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { User, Calendar, ArrowRight } from "lucide-react";
+import { format } from "date-fns";
 
-export default function ArticlesGrid({ articles, searchQuery }) {
-  const filteredArticles = articles.filter(
-    (article) =>
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+export default function ArticlesGrid({
+  articles,
+  searchQuery,
+  setSearchQuery,
+}) {
+  // Filter articles based on search query
+  const filteredArticles = articles
+    .filter(
+      (article) =>
+        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    // Sort articles by date in descending order (latest first)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
-    <section id="articles" className="py-16 md:py-24 bg-neutral-900">
+    <section id="articles" className="py-16 md:py-24 bg-[#1a1a1a]">
       <div className="container mx-auto px-4">
         <div className="mb-12">
           <div className="mb-2 text-[#FFC56D] uppercase tracking-wider text-sm">
             LATEST ARTICLES
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Explore Our Insights
           </h2>
           <p className="text-gray-300 max-w-2xl">
@@ -41,18 +51,23 @@ export default function ArticlesGrid({ articles, searchQuery }) {
                 <div className="relative h-[300px] overflow-hidden rounded-lg">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20 z-10" />
                   <Image
-                    src={article.image || "/placeholder.svg"}
+                    src={
+                      article.coverImage ||
+                      "/placeholder.svg?height=400&width=600"
+                    }
                     alt={article.title}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute top-4 left-4 z-20">
-                    <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">
+                    <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white">
                       {article.category}
                     </span>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                    <h3 className="text-xl font-bold mb-2">{article.title}</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {article.title}
+                    </h3>
                     <p className="text-gray-400 text-sm mb-4">
                       {article.excerpt.length > 100
                         ? `${article.excerpt.substring(0, 100)}...`
@@ -60,13 +75,17 @@ export default function ArticlesGrid({ articles, searchQuery }) {
                     </p>
                     <div className="flex items-center text-sm text-gray-400 mb-4">
                       <User size={14} className="mr-1" />
-                      <span className="mr-4">{article.author}</span>
+                      <span className="mr-4">
+                        {article.author?.name || "Unknown Author"}
+                      </span>
                       <Calendar size={14} className="mr-1" />
-                      <span>{article.date}</span>
+                      <span>
+                        {format(new Date(article.date), "MMMM d, yyyy")}
+                      </span>
                     </div>
                     <Link
-                      href={`/articles/${article.id}`}
-                      className="cta-link inline-flex items-center relative transition-all"
+                      href={`/articles/${article.slug}`}
+                      className="cta-link inline-flex items-center relative transition-all text-white hover:text-[#FFC56D]"
                       aria-label={`Read ${article.title}`}
                     >
                       <span className="cta-text">Read More</span>
@@ -82,13 +101,15 @@ export default function ArticlesGrid({ articles, searchQuery }) {
             <p className="text-xl text-gray-400">
               No articles found matching your search criteria.
             </p>
-            <button
-              className="mt-4 inline-flex items-center px-6 py-3 bg-[#7ED967] text-black rounded-full hover:bg-[#7ED967]/90 transition-colors"
-              onClick={() => setSearchQuery("")}
-              aria-label="View all articles"
-            >
-              View All Articles <ArrowRight className="ml-2 h-4 w-4" />
-            </button>
+            {setSearchQuery && (
+              <button
+                className="mt-4 inline-flex items-center px-6 py-3 bg-[#7ED967] text-black rounded-full hover:bg-[#7ED967]/90 transition-colors"
+                onClick={() => setSearchQuery("")}
+                aria-label="View all articles"
+              >
+                View All Articles <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+            )}
           </div>
         )}
       </div>

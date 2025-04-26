@@ -1,9 +1,15 @@
-
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function SearchFilter({ filterRef, searchQuery, setSearchQuery, articles }) {
-  const categories = [...new Set(articles.map((article) => article.category))].map((category) => ({
+export default function SearchFilter({
+  filterRef,
+  searchQuery,
+  setSearchQuery,
+  articles,
+}) {
+  const categories = [
+    ...new Set(articles.map((article) => article.category)),
+  ].map((category) => ({
     name: category,
     count: articles.filter((article) => article.category === category).length,
   }));
@@ -28,12 +34,16 @@ export default function SearchFilter({ filterRef, searchQuery, setSearchQuery, a
           <div className="flex flex-wrap gap-2">
             <motion.button
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors relative ${
-                searchQuery === "" ? "bg-[#7ED967] text-black" : "bg-neutral-900 text-gray-300 hover:bg-neutral-800"
+                searchQuery === ""
+                  ? "bg-[#7ED967] text-black"
+                  : "bg-neutral-900 text-gray-300 hover:bg-neutral-800"
               }`}
               onClick={() => setSearchQuery("")}
               aria-label="Show all articles"
               aria-current={searchQuery === "" ? "true" : undefined}
-              animate={searchQuery === "" ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+              animate={
+                searchQuery === "" ? { scale: [1, 1.05, 1] } : { scale: 1 }
+              }
               transition={{ duration: 0.3 }}
             >
               All ({articles.length})
@@ -50,12 +60,20 @@ export default function SearchFilter({ filterRef, searchQuery, setSearchQuery, a
               <motion.button
                 key={category.name}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors relative ${
-                  searchQuery === category.name ? "bg-[#7ED967] text-black" : "bg-neutral-900 text-gray-300 hover:bg-neutral-800"
+                  searchQuery === category.name
+                    ? "bg-[#7ED967] text-black"
+                    : "bg-neutral-900 text-gray-300 hover:bg-neutral-800"
                 }`}
                 onClick={() => setSearchQuery(category.name)}
                 aria-label={`Filter by ${category.name}`}
-                aria-current={searchQuery === category.name ? "true" : undefined}
-                animate={searchQuery === category.name ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+                aria-current={
+                  searchQuery === category.name ? "true" : undefined
+                }
+                animate={
+                  searchQuery === category.name
+                    ? { scale: [1, 1.05, 1] }
+                    : { scale: 1 }
+                }
                 transition={{ duration: 0.3 }}
               >
                 {category.name} ({category.count})
@@ -74,4 +92,4 @@ export default function SearchFilter({ filterRef, searchQuery, setSearchQuery, a
       </div>
     </section>
   );
-            }
+}

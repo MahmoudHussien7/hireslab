@@ -2,8 +2,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { ThemeProvider } from "@/components/theme-provider";
-import { LoaderProvider } from "@/context/Loader-context";
+import Providers from "@/app/Provider"; // استوردت ملف الـ Providers
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,20 +22,13 @@ export default function RootLayout({ children }) {
         className={`${poppins.variable} font-sans`}
         cz-shortcut-listen="true"
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <LoaderProvider>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-          </LoaderProvider>
-        </ThemeProvider>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

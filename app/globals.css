@@ -101,6 +101,26 @@ body {
   background-position: right center;
 }
 
+/* Add to your global CSS */
+.tiptap {
+  min-height: 300px;
+  padding: 1rem;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 0.375rem 0.375rem;
+}
+
+.dark .tiptap {
+  background-color: #1f2937;
+  color: #fff;
+  border-color: #374151;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -60,6 +60,23 @@ export default function ContactUs() {
     }
   };
 
+  const getAllArticles = async () => {
+    try {
+      const response = await fetch("https://hires-lab.glitch.me/api/articles", {
+        method: "GET",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("getAllData - Response OKAY - data", data);
+        console.log("OKAY");
+      } else {
+        console.log("getAllData - Response NOT OKAY");
+      }
+    } catch (error) {
+      console.error("getAllData - Try/Catch - Error", error);
+    }
+  };
+
   return (
     <div className="bg-black min-h-screen">
       {/* Spacer for fixed header */}
