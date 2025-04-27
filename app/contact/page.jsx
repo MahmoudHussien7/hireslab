@@ -1,80 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { submitContact, resetStatus } from "@/redux/slices/contactSlice"; // update the import based on your structure
 import ContactHero from "@/components/contact/ContactHero";
 import ContactSelector from "@/components/contact/ContactSelector";
 import ContactForm from "@/components/contact/ContactForm";
 import ContactConfirmation from "@/components/contact/ContactConfirmation";
 
 export default function ContactUs() {
+  const dispatch = useDispatch();
+  const { loading, error, success } = useSelector((state) => state.contact);
+
   const [role, setRole] = useState("Candidate");
   const [lookingFor, setLookingFor] = useState("Select one");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    company: "",
+    phone: "",
+    subject: "",
     message: "",
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // inside useEffect reset:
+  useEffect(() => {
+    if (success) {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+      setRole("Candidate");
+      setLookingFor("Select one");
+    }
+  }, [success]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    const dataToSend = {
-      role,
-      lookingFor,
-      ...formData,
-    };
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (response.ok) {
-        setIsSubmitted(true);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          company: "",
-          message: "",
-        });
-        setRole("Candidate");
-        setLookingFor("Select one");
-      } else {
-        console.error("Failed to submit form");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
+    dispatch(submitContact(formData)); // only send formData
   };
 
-  const getAllArticles = async () => {
-    try {
-      const response = await fetch("https://hires-lab.glitch.me/api/articles", {
-        method: "GET",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("getAllData - Response OKAY - data", data);
-        console.log("OKAY");
-      } else {
-        console.log("getAllData - Response NOT OKAY");
-      }
-    } catch (error) {
-      console.error("getAllData - Try/Catch - Error", error);
-    }
+  const handleReset = () => {
+    dispatch(resetStatus());
   };
 
   return (
@@ -83,8 +59,8 @@ export default function ContactUs() {
       <div className="h-20 md:h-24" />
       <ContactHero />
       <div className="bg-opacity-80 p-8 flex-col  rounded-lg shadow-lg">
-        {isSubmitted ? (
-          <ContactConfirmation onReset={() => setIsSubmitted(false)} />
+        {success ? (
+          <ContactConfirmation onReset={handleReset} />
         ) : lookingFor === "Select one" ? (
           <div className="items-center justify-center flex">
             <ContactSelector
@@ -103,6 +79,8 @@ export default function ContactUs() {
               onBack={() => setLookingFor("Select one")}
               onChange={handleFormChange}
               onSubmit={handleSubmit}
+              loading={loading}
+              error={error}
             />
           </div>
         )}
