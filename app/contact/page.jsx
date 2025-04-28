@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { submitContact, resetStatus } from "@/redux/slices/contactSlice"; // update the import based on your structure
+import { submitContact, resetStatus } from "@/redux/slices/contactSlice";
 import ContactHero from "@/components/contact/ContactHero";
 import ContactSelector from "@/components/contact/ContactSelector";
 import ContactForm from "@/components/contact/ContactForm";
@@ -22,8 +22,9 @@ export default function ContactUs() {
     subject: "",
     message: "",
   });
+  const [optimisticSuccess, setOptimisticSuccess] = useState(false);
 
-  // inside useEffect reset:
+  // Reset form on actual success
   useEffect(() => {
     if (success) {
       setFormData({
@@ -36,8 +37,21 @@ export default function ContactUs() {
       });
       setRole("Candidate");
       setLookingFor("Select one");
+      setOptimisticSuccess(true);
     }
   }, [success]);
+
+  // Revert optimistic update on error
+  useEffect(() => {
+    if (error) {
+      setOptimisticSuccess(false);
+    }
+  }, [error]);
+
+  // Update formData.subject whenever lookingFor changes
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, subject: lookingFor }));
+  }, [lookingFor]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -46,11 +60,15 @@ export default function ContactUs() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(submitContact(formData)); // only send formData
+    // Optimistically set success state
+    setOptimisticSuccess(true);
+    const submissionData = { ...formData, subject: lookingFor };
+    dispatch(submitContact(submissionData));
   };
 
   const handleReset = () => {
     dispatch(resetStatus());
+    setOptimisticSuccess(false);
   };
 
   return (
@@ -58,8 +76,8 @@ export default function ContactUs() {
       {/* Spacer for fixed header */}
       <div className="h-20 md:h-24" />
       <ContactHero />
-      <div className="bg-opacity-80 p-8 flex-col  rounded-lg shadow-lg">
-        {success ? (
+      <div className="bg-opacity-80 p-8 flex-col rounded-lg shadow-lg">
+        {optimisticSuccess || success ? (
           <ContactConfirmation onReset={handleReset} />
         ) : lookingFor === "Select one" ? (
           <div className="items-center justify-center flex">
@@ -76,7 +94,10 @@ export default function ContactUs() {
               role={role}
               lookingFor={lookingFor}
               formData={formData}
-              onBack={() => setLookingFor("Select one")}
+              onBack={() => {
+                setLookingFor("Select one");
+                setOptimisticSuccess(false);
+              }}
               onChange={handleFormChange}
               onSubmit={handleSubmit}
               loading={loading}
