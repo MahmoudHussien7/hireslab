@@ -7,44 +7,28 @@ import {
   Twitter,
   Linkedin,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
 
 export default function ContactForm({
-  role,
-  lookingFor,
-  formData,
-  onBack,
-  onChange,
-  onSubmit,
+  role = "Candidate",
+  lookingFor = "Select one",
+  formData = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    subject: "",
+    message: "",
+  },
+  onBack = () => {},
+  onChange = () => {},
+  onSubmit = () => {},
+  loading = false,
+  error = null,
 }) {
   const [errors, setErrors] = useState({});
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    let fileError = "";
-
-    if (file) {
-      const allowedTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ];
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-
-      if (!allowedTypes.includes(file.type)) {
-        fileError = "File must be a PDF, DOC, or DOCX.";
-      } else if (file.size > maxSize) {
-        fileError = "File size must not exceed 5MB.";
-      }
-    }
-
-    setErrors((prev) => ({ ...prev, resume: fileError }));
-    if (!fileError) {
-      onChange({ target: { name: "resume", value: file } });
-    }
-  };
 
   const validateForm = (e) => {
     e.preventDefault();
@@ -77,15 +61,9 @@ export default function ContactForm({
       newErrors.email = "Please enter a valid email address.";
     }
 
-    // Company Validation (Optional)
-    if (formData.company && formData.company.length < 2) {
-      newErrors.company = "Company name must be at least 2 characters.";
-    } else if (
-      formData.company &&
-      !/^[a-zA-Z0-9\s&-.]+$/.test(formData.company)
-    ) {
-      newErrors.company =
-        "Company name can only contain letters, numbers, spaces, and & - .";
+    // Subject Validation (using lookingFor)
+    if (!lookingFor || lookingFor === "Select one") {
+      newErrors.subject = "Subject is required.";
     }
 
     // Message Validation
@@ -174,6 +152,12 @@ export default function ContactForm({
           </button>
         </div>
 
+        {error && (
+          <p className="text-red-400 text-sm mb-4">
+            Submission failed: {error}. Please try again.
+          </p>
+        )}
+
         <form onSubmit={validateForm} className="flex flex-col gap-6">
           {/* Form Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -184,15 +168,16 @@ export default function ContactForm({
                   type="text"
                   name="firstName"
                   id="firstName"
-                  value={formData.firstName}
+                  value={formData.firstName || ""}
                   onChange={onChange}
                   required
-                  className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                  disabled={loading}
+                  className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50"
                   placeholder="First name*"
                 />
               </label>
               {errors.firstName && (
-                <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>
+                <p className="text-red-400 text-xsMT-1">{errors.firstName}</p>
               )}
             </div>
             <div className="w-full">
@@ -202,10 +187,11 @@ export default function ContactForm({
                   type="text"
                   name="lastName"
                   id="lastName"
-                  value={formData.lastName}
+                  value={formData.lastName || ""}
                   onChange={onChange}
                   required
-                  className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                  disabled={loading}
+                  className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50"
                   placeholder="Last name*"
                 />
               </label>
@@ -222,10 +208,11 @@ export default function ContactForm({
                 type="email"
                 name="email"
                 id="email"
-                value={formData.email}
+                value={formData.email || ""}
                 onChange={onChange}
                 required
-                className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                disabled={loading}
+                className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50"
                 placeholder="mail@site.com"
               />
             </label>
@@ -233,43 +220,6 @@ export default function ContactForm({
               <p className="text-red-400 text-xs mt-1">{errors.email}</p>
             )}
           </div>
-
-          <div className="w-full">
-            <label className="floating-label">
-              <span className="text-gray-400">Company (optional)</span>
-              <input
-                type="text"
-                name="company"
-                id="company"
-                value={formData.company}
-                onChange={onChange}
-                className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                placeholder="Company (optional)"
-              />
-            </label>
-            {errors.company && (
-              <p className="text-red-400 text-xs mt-1">{errors.company}</p>
-            )}
-          </div>
-
-          {role === "Candidate" && (
-            <div className="w-full">
-              <label className="floating-label">
-                <span className="text-gray-400">Upload Resume (optional)</span>
-                <input
-                  type="file"
-                  name="resume"
-                  id="resume"
-                  onChange={handleFileChange}
-                  accept=".pdf,.doc,.docx"
-                  className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600"
-                />
-              </label>
-              {errors.resume && (
-                <p className="text-red-400 text-xs mt-1">{errors.resume}</p>
-              )}
-            </div>
-          )}
 
           <div className="w-full">
             <label className="block text-sm text-gray-400 mb-2">
@@ -286,11 +236,12 @@ export default function ContactForm({
               <textarea
                 name="message"
                 id="message"
-                value={formData.message}
+                value={formData.message || ""}
                 onChange={onChange}
                 required
+                disabled={loading}
                 rows="4"
-                className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 resize-none"
+                className="input input-md w-full bg-gray-800 border-gray-600 text-white placeholder-gray-400 resize-none disabled:opacity-50"
                 placeholder="Write your message..."
               ></textarea>
             </label>
@@ -300,8 +251,20 @@ export default function ContactForm({
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" variant="prime">
-              Send Message
+            <Button
+              type="submit"
+              variant="prime"
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={16} />
+                  Sending...
+                </>
+              ) : (
+                "Send Message"
+              )}
             </Button>
           </div>
         </form>
