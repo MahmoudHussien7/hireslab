@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Btn({name ,className}) {
   return (
-    <div className='py-10'>
+    <div className='py-5'>
         <Link
               href="/schedule-a-call"
               target="_blank"

@@ -7,7 +7,7 @@ export default function ServicesBenefits() {
   return (
     <>
       <section className='container mx-auto px-10 md:px-12 lg:px-20 w-full h-auto text-white flex justify-center items-center py-16'>
-        <div className='bg-[#292929] md:flex  p-10 rounded-lg'>
+        <div className='bg-[#292929] md:flex p-5 rounded-lg'>
           <div className=' p-3'>
             <h2 className='text-2xl font-medium mb-4'>Go embedded</h2>
             <p className='mb-4'>
