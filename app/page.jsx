@@ -13,9 +13,9 @@ export default function Home() {
       <VideoSection />
       <ServicesCarousel />
       <StatsSection />
+      <LetsTalkSection />
       <CommunitySection />
       <Newsletter />
-      <LetsTalkSection />
     </>
   );
 }

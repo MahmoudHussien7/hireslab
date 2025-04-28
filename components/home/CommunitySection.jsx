@@ -19,7 +19,10 @@ export default function CommunitySection() {
   const y = useTransform(scrollYProgress, [0, 0.5], [50, 0]);
 
   return (
-    <section ref={targetRef} className="py-16 bg-white">
+    <section
+      ref={targetRef}
+      className="p-16 relative h-screen flex items-center justify-center bg-white"
+    >
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>

@@ -115,27 +115,6 @@ export default function StatsSection() {
             );
           })}
         </div>
-
-        {/* Clients Strip */}
-        <div className="mt-20">
-          <h3 className="text-center text-xl mb-8 text-gray-500">
-            Trusted by Leading Companies
-          </h3>
-          <div className="flex flex-wrap justify-center items-cente gap-8 md:gap-12">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="w-24 h-12 relative grayscale hover:grayscale-0 transition-all"
-              >
-                <img
-                  src={`/placeholder.svg?height=60&width=120&text=Client${i}`}
-                  alt={`Client ${i}`}
-                  className="object-contain w-full h-full"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );
