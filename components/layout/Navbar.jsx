@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import ModalForm from "@/components/services/ModalForm";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,6 +19,8 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
 
@@ -37,8 +40,10 @@ export default function Navbar() {
   }, []);
 
   return (
+    <>
+    <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 p-16 ${
+      className={`fixed top-0 w-full z-40 transition-all duration-300 p-16 ${
         scrolled
           ? "bg-gray/90 text-white backdrop-blur-md py-3 shadow-md"
           : "bg-gray text-white py-5"
@@ -119,19 +124,21 @@ export default function Navbar() {
                 onClick={() =>
                   document
                     .getElementById("contact")
-                    ?.scrollIntoView({ behavior: "smooth" })
+                    ?.scrollIntoView({ behavior: "smooth" },
+                    )
                 }
                 style={{ rotate: rotateDeg }}
                 className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg cursor-pointer mx-auto"
               >
-                <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
+                <button onClick={()=>setIsModalOpen(true)} className="text-[10px] font-medium tracking-widest text-center leading-tight cursor-pointer">
                   WORK WITH US
-                </span>
+                </button>
               </motion.div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
+    </>
   );
 }

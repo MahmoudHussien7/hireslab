@@ -1,11 +1,17 @@
+"use client";
+
 import React from 'react';
-import Image from "next/image";
-import Link from 'next/link';
-import Btn from '../ui/Btn';
+import ModalForm from '@/components/services/ModalForm';
+import{ useState } from 'react';
+import BtnSubmit from '../ui/BtnSubmit';
 
 export default function ServicesBenefits() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <>
+    <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
+
       <section className='container mx-auto px-10 md:px-12 lg:px-20 w-full h-auto text-white flex justify-center items-center py-16'>
         <div className='bg-[#292929] md:flex p-5 rounded-lg'>
           <div className=' p-3'>
@@ -14,44 +20,10 @@ export default function ServicesBenefits() {
               Find out why our partners like Brilliant Planet,
               Copper <br /> and Volta Trucks are all going embedded with Bond.
             </p>
-            <Btn name="Let's talk"/>   
-            
-            {/* <Link
-              href="/schedule-a-call"
-              target="_blank"
-              className="inline-block bg-zaza text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors "
-            >
-              <span className="flex items-center">
-                <span className="mr-3">Let's talk</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20.174"
-                  height="12.383"
-                  viewBox="0 0 20.174 12.383"
-                >
-                  <g transform="translate(-1735.326 -211.883)">
-                    <line
-                      y2="19.674"
-                      transform="translate(1735.326 218.061) rotate(-90)"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeMiterlimit="10"
-                      strokeWidth="1"
-                    />
-                    <path
-                      d="M1.061,126.938l4.867,4.867H7.872l4.865-4.865"
-                      transform="translate(1623.194 224.974) rotate(-90)"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeMiterlimit="10"
-                      strokeWidth="1"
-                    />
-                  </g>
-                </svg>
-              </span>
-            </Link> */}
+            <BtnSubmit name="Let's talk" type="text" onClick={() => {setIsModalOpen(true)
+             console.log("test")}
+             } />
           </div>
-
           <div className='p-3'>
             <div className='mb-4'>
               <h2 className='text-2xl font-medium'>Benefits</h2>
