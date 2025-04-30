@@ -27,7 +27,7 @@ const teamMembers = [
 
 export default function OurTeam() {
   return (
-    <section className="py-16 md:py-24 bg-gray-100">
+    <section className="py-16 md:py-24 text-white">
       <div className="container mx-auto px-4">
         <SectionHeading
           title="Meet Our Team"
@@ -35,7 +35,7 @@ export default function OurTeam() {
           center
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-white ">
           {teamMembers.map((member, index) => (
             <motion.div
               key={index}
@@ -43,7 +43,7 @@ export default function OurTeam() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-lg overflow-hidden shadow-md"
+              className=" rounded-lg overflow-hidden shadow-md"
             >
               <div className="relative h-64 w-64 mx-auto mt-6">
                 <Image
