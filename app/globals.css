@@ -13,11 +13,64 @@ body {
     text-wrap: balance;
   }
 }
-@layer components{
+@layer components {
   .clip-img {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 50px 100%, 0 calc(100% - 100px));
   }
 }
+/* app/not-found.css */
+
+@keyframes hueRotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(-120deg);
+  }
+  100% {
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* Add your drawLine, flicker, fadeInText keyframes and use them as Tailwind custom animations if needed */
+
+@keyframes fadeInText {
+  1% {
+    color: #12000a;
+    text-shadow: 0px 0px 4px #12000a;
+  }
+  70% {
+    color: #ff005d;
+    text-shadow: 0px 0px 14px #ff005d;
+  }
+  100% {
+    color: #ff005d;
+    text-shadow: 0px 0px 4px #ff005d;
+  }
+}
+
+@keyframes flicker4 {
+  0%,
+  30%,
+  32%,
+  36%,
+  42%,
+  85%,
+  96%,
+  100% {
+    color: #ff005d;
+    text-shadow: 0px 0px 4px #ff005d;
+  }
+  31%,
+  37%,
+  41%,
+  86%,
+  95% {
+    color: #12000a;
+    text-shadow: 0px 0px 4px #12000a;
+  }
+}
+
 .custom-hover::before {
   content: "";
   position: absolute;
