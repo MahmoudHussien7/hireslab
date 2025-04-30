@@ -1,4 +1,5 @@
 .clip_img {
-    background-image: url(/images/heroServices.jpg);
+    background-image: url(/images/heroServices.jpg);    
     /* clip-path: polygon(0 0, 100% 0, 100% 100%, 50px 100%, 0 calc(100% - 100px)); */
   }
+

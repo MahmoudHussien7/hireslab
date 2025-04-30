@@ -126,6 +126,16 @@ body {
   max-width: 100%;
   height: auto;
 }
+.floating-label span {
+  background-color: transparent !important;
+  color: white;
+  border: 0px !important;
+  position: absolute;
+  top:-10px;
+  left: 0px;
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
