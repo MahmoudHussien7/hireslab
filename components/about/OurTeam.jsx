@@ -6,22 +6,23 @@ import SectionHeading from "@/components/ui/SectionHeading";
 
 const teamMembers = [
   {
-    name: "Jane Smith",
-    role: "Founder & CEO",
-    image: "/placeholder.svg?height=400&width=400",
-    bio: "15+ years in recruitment and HR consulting",
-  },
-  {
     name: "John Davis",
     role: "Head of Talent Acquisition",
     image: "/placeholder.svg?height=400&width=400",
     bio: "Expert in executive search and leadership recruitment",
   },
   {
-    name: "Sarah Johnson",
-    role: "HR Consultant",
+    name: "ِAbdallah Afify",
+    role: "Founder & CEO",
     image: "/placeholder.svg?height=400&width=400",
-    bio: "Specializes in organizational development and HR strategy",
+    bio: "15+ years in recruitment and HR consulting",
+  },
+
+  {
+    name: "Nour Abbas",
+    role: "Head of Marketing",
+    image: "/placeholder.svg?height=400&width=400",
+    bio: "Specializes in organizational development and Marketing strategies",
   },
 ];
 

@@ -20,11 +20,12 @@ const navLinks = [
 
 export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
 
-  if (isDashboard) return null; // 👈 Skip rendering if in dashboard
+  // Skip rendering if in dashboard
+  if (isDashboard) return null;
+
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [rotateDeg, setRotateDeg] = useState(0);
@@ -39,106 +40,107 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleWorkWithUsClick = () => {
+    setIsModalOpen(true);
+    if (isOpen) setIsOpen(false);
+  };
+
   return (
     <>
-    <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    <header
-      className={`fixed top-0 w-full z-40 transition-all duration-300 p-16 ${
-        scrolled
-          ? "bg-gray/90 text-white backdrop-blur-md py-3 shadow-md"
-          : "bg-gray text-white py-5"
-      }`}
-    >
-      <div className="container mx-auto px-4 flex justify-between items-center relative h-20">
-        <Link href="/">
-          <Image
-            src="/images/logo.png"
-            width={150}
-            height={50}
-            alt="Logo"
-            className="flex items-center"
-          />
-        </Link>
+      <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <header
+        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+          scrolled
+            ? "bg-gray/90 backdrop-blur-md py-3 shadow-md"
+            : "bg-gray py-5"
+        }`}
+      >
+        <div className="container mx-auto px-16 flex justify-between items-center relative h-20">
+          {/* Logo */}
+          <Link href="/" className="z-50">
+            <Image
+              src="/images/logo.png"
+              width={150}
+              height={50}
+              alt="Logo"
+              className="flex items-center"
+            />
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center justify-center space-x-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className="px-4 py-2 text-base  text-gray hover:text-accent transition-colors"
-            >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Work With Us Circle - Aligned within Navbar */}
-        <motion.div
-          onClick={() =>
-            document
-              .getElementById("contact")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          style={{ rotate: rotateDeg }}
-          className="hidden md:flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer absolute right-4"
-        >
-          <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
-            WORK WITH US
-          </span>
-        </motion.div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-gray-900"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white"
-          >
-            <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="px-4 py-2 text-base text-gray-900 hover:text-blue-600 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              {/* Work With Us Circle - Mobile */}
-              <motion.div
-                onClick={() =>
-                  document
-                    .getElementById("contact")
-                    ?.scrollIntoView({ behavior: "smooth" },
-                    )
-                }
-                style={{ rotate: rotateDeg }}
-                className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg cursor-pointer mx-auto"
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center justify-center space-x-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="px-4 py-2 text-base text-white hover:text-accent transition-colors"
               >
-                <button onClick={()=>setIsModalOpen(true)} className="text-[10px] font-medium tracking-widest text-center leading-tight cursor-pointer">
-                  WORK WITH US
-                </button>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+                {link.name}
+              </Link>
+            ))}
+
+            {/* Work With Us Button - Desktop */}
+            <motion.button
+              onClick={handleWorkWithUsClick}
+              style={{ rotate: rotateDeg }}
+              className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer"
+            >
+              <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
+                WORK WITH US
+              </span>
+            </motion.button>
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-white z-50"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden fixed inset-0 bg-gray/95 backdrop-blur-md z-40 flex items-center justify-center"
+            >
+              <div className="container flex flex-col items-center space-y-6 py-20">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className="px-4 py-2 text-xl text-white hover:text-accent transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+
+                {/* Work With Us Button - Mobile (same as desktop) */}
+                <motion.button
+                  onClick={handleWorkWithUsClick}
+                  style={{ rotate: rotateDeg }}
+                  className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer mt-4"
+                >
+                  <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
+                    WORK WITH US
+                  </span>
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Spacer to prevent content from being hidden under fixed navbar */}
+      <div className={`h-28 ${scrolled ? "h-24" : "h-32"}`}></div>
     </>
   );
 }
