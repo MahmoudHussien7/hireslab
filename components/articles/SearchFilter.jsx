@@ -8,11 +8,15 @@ export default function SearchFilter({
   articles,
 }) {
   const categories = [
-    ...new Set(articles.map((article) => article.category)),
-  ].map((category) => ({
-    name: category,
-    count: articles.filter((article) => article.category === category).length,
-  }));
+    ...new Set(articles.map((article) => article.category?.toLowerCase())),
+  ]
+    .filter(Boolean)
+    .map((category) => ({
+      name: category.charAt(0).toUpperCase() + category.slice(1),
+      count: articles.filter(
+        (article) => article.category?.toLowerCase() === category
+      ).length,
+    }));
 
   return (
     <section ref={filterRef} className="py-8 border-b border-neutral-800">

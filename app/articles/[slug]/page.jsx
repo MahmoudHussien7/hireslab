@@ -67,18 +67,16 @@ export default function BlogPostPage({ params: paramsPromise }) {
             })
           : "Unknown Date",
         author: singleArticle.writer?.name || "Unknown Author",
-        authorRole: "Contributor", // Mocked (not provided by API)
+        authorRole: singleArticle.writer?.about, // Mocked (not provided by API)
         authorImage:
           singleArticle.writer?.image ||
           "/placeholder.svg?height=100&width=100",
         authorBio: singleArticle.writer?.about || "No bio available.",
-        category: singleArticle.writer?.about?.includes("technology")
-          ? "Technology"
-          : "General",
+        category: singleArticle.category || "General",
         image: singleArticle.image || "/placeholder.svg?height=600&width=1200",
         readingTime: singleArticle.readingTime,
         content: singleArticle.content || "No content available.",
-        tags: ["Technology", "Innovation"], // Mocked (not provided by API)
+        tags: singleArticle.tags || ["ata"], // Mocked (not provided by API)
       }
     : null;
 

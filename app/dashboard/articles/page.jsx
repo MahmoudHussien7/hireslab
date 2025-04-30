@@ -12,6 +12,8 @@ import {
   Edit,
   Trash2,
   FileText,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
@@ -29,85 +31,122 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/Select";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
-import { fetchArticles, deleteArticle } from "@/redux/slices/blogSlice";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  fetchArticles,
+  deleteArticle,
+  fetchCategories,
+} from "@/redux/slices/blogSlice";
 
-function stripHtmlAndTruncate(htmlString, maxLength) {
+const stripHtmlAndTruncate = (htmlString, maxLength) => {
   const plainText = htmlString.replace(/<[^>]+>/g, "");
   return plainText.length > maxLength
     ? plainText.slice(0, maxLength) + "..."
     : plainText;
-}
+};
 
-function generateSlug(text) {
+const generateSlug = (text) => {
   return text
     .toLowerCase()
     .replace(/ /g, "-")
     .replace(/[^\w-]+/g, "");
-}
+};
 
 export default function ArticlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const itemsPerPage = 10;
 
   const dispatch = useDispatch();
-  const { articles, loading, error } = useSelector((state) => state.blog);
-  const [hasFetched, setHasFetched] = useState(false);
+  const {
+    articles,
+    categories,
+    status,
+    error: reduxError,
+  } = useSelector((state) => state.blog);
 
   useEffect(() => {
-    if (!hasFetched) {
-      setHasFetched(true);
-      dispatch(fetchArticles());
-    }
-  }, [dispatch, hasFetched]);
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        await Promise.all([
+          dispatch(fetchArticles()).unwrap(),
+          dispatch(fetchCategories()).unwrap(),
+        ]);
+      } catch (err) {
+        setError(err.message || "Failed to fetch data");
+        console.error("Error fetching data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const categories = [
-    "all",
-    ...new Set(
-      (articles || [])
-        .map((article) => article.category?.toLowerCase())
-        .filter(Boolean)
-    ),
-  ];
+    fetchData();
+  }, [dispatch]);
 
-  const filteredArticles = (articles || [])
+  // Filter articles based on search term and category
+  const filteredArticles = articles
     .filter((article) => {
       const matchesSearch =
         searchTerm === "" ||
         article.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus =
-        statusFilter === "all" || article.status === statusFilter;
       const matchesCategory =
         categoryFilter === "all" ||
         article.category?.toLowerCase() === categoryFilter;
-      return matchesSearch && matchesStatus && matchesCategory;
+      return matchesSearch && matchesCategory;
     })
     .map((article) => ({
       id: article._id,
       title: article.name,
-      excerpt: article.excerpt || stripHtmlAndTruncate(article.content, 100),
-      coverImage: article.image,
+      excerpt: stripHtmlAndTruncate(article.content, 100),
+      coverImage: article.image || "/placeholder.svg?height=400&width=600",
       category: article.category || "General",
       author: article.writer ? article.writer.name : "Unknown Author",
       date: article.date,
-      createdAt: article.createdAt,
       views: article.views || 0,
-      status: article.status,
       slug: generateSlug(article.name),
     }));
 
-  const handleDelete = (id) => {
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedArticles = filteredArticles.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this article?")) {
-      dispatch(deleteArticle(id));
+      try {
+        await dispatch(deleteArticle(id)).unwrap();
+      } catch (err) {
+        alert(`Failed to delete article: ${err.message || "Unknown error"}`);
+        console.error("Error deleting article:", err);
+      }
     }
+  };
+
+  const handleRetry = () => {
+    dispatch(fetchArticles());
+    dispatch(fetchCategories());
+    setError(null);
   };
 
   return (
@@ -145,43 +184,44 @@ export default function ArticlesPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories
-                    .filter((c) => c !== "all")
-                    .map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <Filter className="mr-2 h-4 w-4" />
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category.toLowerCase()}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {loading ? (
-            <div className="text-center py-10">Loading articles...</div>
-          ) : error ? (
-            <div className="text-center text-red-500 py-10">Error: {error}</div>
-          ) : filteredArticles.length === 0 ? (
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription className="flex justify-between items-center">
+                <span>{error}</span>
+                <Button onClick={handleRetry} variant="outline" size="sm">
+                  Retry
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Loader2 className="h-12 w-12 text-muted-foreground mb-4 animate-spin" />
+              <h3 className="text-lg font-medium">Loading articles...</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Please wait while we fetch your articles.
+              </p>
+            </div>
+          ) : paginatedArticles.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No articles found</h3>
@@ -196,7 +236,6 @@ export default function ArticlesPage() {
                 <thead>
                   <tr className="border-b text-left">
                     <th className="pb-3 font-medium">Title</th>
-                    <th className="pb-3 font-medium">Status</th>
                     <th className="pb-3 font-medium">Category</th>
                     <th className="pb-3 font-medium">Date</th>
                     <th className="pb-3 font-medium text-right">Views</th>
@@ -204,26 +243,12 @@ export default function ArticlesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredArticles.map((article) => (
+                  {paginatedArticles.map((article) => (
                     <tr key={article.id} className="border-b">
                       <td className="py-3">{article.title}</td>
-                      <td className="py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            article.status === "published"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          }`}
-                        >
-                          {article.status
-                            ? article.status.charAt(0).toUpperCase() +
-                              article.status.slice(1)
-                            : "Unknown"}
-                        </span>
-                      </td>
                       <td className="py-3">{article.category}</td>
                       <td className="py-3 text-muted-foreground">
-                        {new Date(article.createdAt).toLocaleDateString()}
+                        {new Date(article.date).toLocaleDateString()}
                       </td>
                       <td className="py-3 text-right">
                         {article.views.toLocaleString()}
@@ -241,7 +266,7 @@ export default function ArticlesPage() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/blog/${article.slug}`}
+                                href={`/articles/${article.slug}`}
                                 className="flex items-center"
                               >
                                 <Eye className="mr-2 h-4 w-4" /> View
@@ -271,22 +296,36 @@ export default function ArticlesPage() {
               </table>
             </div>
           )}
-
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing <strong>{filteredArticles.length}</strong> of{" "}
-              <strong>{articles.length}</strong> articles
-            </div>
+        </CardContent>
+        <CardFooter className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing <strong>{paginatedArticles.length}</strong> of{" "}
+            <strong>{filteredArticles.length}</strong> articles
+          </div>
+          {filteredArticles.length > itemsPerPage && (
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" disabled>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
                 Previous
               </Button>
-              <Button variant="outline" size="sm">
+              <div className="text-sm px-2">
+                Page {currentPage} of {totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
                 Next
               </Button>
             </div>
-          </div>
-        </CardContent>
+          )}
+        </CardFooter>
       </Card>
     </div>
   );
