@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -14,7 +14,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/Select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,29 +24,38 @@ import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
-import { createArticle } from "@/redux/slices/blogSlice";
+import {
+  createArticle,
+  fetchCategories,
+  fetchTags,
+  fetchAuthors,
+} from "@/redux/slices/blogSlice";
 
-// Sample categories
-const categories = [
-  "Trends",
-  "Recruitment",
-  "Talent Management",
-  "Technology",
-  "Training",
-  "Compliance",
-  "Culture",
-];
+// Utility to generate a unique hash for an object
+const generateHash = (obj) => {
+  const str = JSON.stringify(obj);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return hash.toString();
+};
 
-// Utility function to estimate reading time
 const estimateReadingTime = (content) => {
-  const wordsPerMinute = 200; // Average reading speed
-  const text = content.replace(/<[^>]*>/g, ""); // Strip HTML tags
+  const wordsPerMinute = 200;
+  const text = content.replace(/<[^>]*>/g, "");
   const words = text.trim().split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
   return `${minutes} min read`;
 };
 
-// Custom Toolbar Component for TipTap
+const stripHtmlAndTruncate = (html, maxLength = 100) => {
+  const text = html.replace(/<[^>]*>/g, "");
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+
 const Toolbar = ({ editor }) => {
   const linkInputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -67,9 +76,11 @@ const Toolbar = ({ editor }) => {
   const addImage = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Mock image upload (replace with actual upload logic)
-      const imageUrl = "/images/uploaded-content-image.jpg"; // Replace with actual URL
-      editor.chain().focus().setImage({ src: imageUrl }).run();
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        editor.chain().focus().setImage({ src: reader.result }).run();
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -195,35 +206,41 @@ const Toolbar = ({ editor }) => {
 export default function NewArticlePage() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [status, setStatus] = useState("draft");
-  const [excerpt, setExcerpt] = useState("");
+  const [newCategory, setNewCategory] = useState("");
   const [tags, setTags] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [author, setAuthor] = useState("");
+  const [newAuthorName, setNewAuthorName] = useState("");
+  const [newAuthorImage, setNewAuthorImage] = useState("");
+  const [newAuthorBio, setNewAuthorBio] = useState("");
+  const [excerpt, setExcerpt] = useState("");
 
   const dispatch = useDispatch();
   const router = useRouter();
-  const { loading, error } = useSelector((state) => state.blog);
+  const {
+    categories,
+    tags: existingTags,
+    authors,
+    loading,
+    error,
+  } = useSelector((state) => state.blog);
 
-  // Initialize TipTap Editor
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchTags());
+    dispatch(fetchAuthors());
+  }, [dispatch]);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
-      LinkExtension.configure({
-        openOnClick: false,
-        autolink: true,
-      }),
-      ImageExtension.configure({
-        inline: true,
-      }),
+      LinkExtension.configure({ openOnClick: false, autolink: true }),
+      ImageExtension.configure({ inline: true }),
       TextStyle,
       Color,
     ],
-    content: "", // Initial content
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      // Update content state (you can also store it in Redux if needed)
-    },
+    content: "",
   });
 
   const handleImageChange = (e) => {
@@ -238,45 +255,59 @@ export default function NewArticlePage() {
     }
   };
 
+  const handleAuthorImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewAuthorImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Mock image upload (replace with actual upload logic)
     let imageUrl = "";
     if (imageFile) {
-      imageUrl = "/images/uploaded-image.jpg"; // Replace with actual uploaded URL
+      // Mock upload (replace with actual API call)
+      imageUrl = "/images/uploaded-image.jpg";
     }
 
-    // Get content from TipTap editor
     const content = editor ? editor.getHTML() : "";
+    const generatedExcerpt = excerpt || stripHtmlAndTruncate(content, 100);
 
-    // Generate excerpt if not provided
-    const generatedExcerpt =
-      excerpt || content.replace(/<[^>]*>/g, "").substring(0, 100) + "...";
+    const writer =
+      author === "new"
+        ? {
+            name: newAuthorName,
+            image: newAuthorImage || "/placeholder.svg?height=100&width=100",
+            about: newAuthorBio || "No bio provided.",
+          }
+        : authors.find((a) => a.name === author) || {
+            name: "Unknown Author",
+            image: "/placeholder.svg?height=100&width=100",
+            about: "No bio available.",
+          };
 
-    // Prepare article data for the API
     const articleData = {
       name: title,
-      content, // HTML content from TipTap
-      writer: {
-        name: "John Smith", // Hardcoded for now
-        image: "https://example.com/images/writers/john.jpg",
-        about: "John is a technology journalist.",
-      },
+      content,
+      writer,
       date: new Date().toISOString(),
       readingTime: estimateReadingTime(content),
       image: imageUrl || "/placeholder.svg?height=400&width=600",
-      category: category.toLowerCase(),
-      status,
-      excerpt: generatedExcerpt,
+      category: newCategory || category || "General",
       tags: tags
         .split(",")
         .map((tag) => tag.trim())
         .filter((tag) => tag),
+      excerpt: generatedExcerpt,
     };
 
     try {
-      const result = await dispatch(createArticle(articleData)).unwrap();
+      await dispatch(createArticle(articleData)).unwrap();
       router.push("/dashboard/articles");
     } catch (err) {
       console.error("Failed to create article:", err);
@@ -329,31 +360,73 @@ export default function NewArticlePage() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={category} onValueChange={setCategory} required>
+                  <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger id="category">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Select or add a category" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat.toLowerCase()}>
-                          {cat}
+                        <SelectItem key={cat} value={cat}>
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
                         </SelectItem>
                       ))}
+                      <SelectItem value="new">Add new category...</SelectItem>
                     </SelectContent>
                   </Select>
+                  {category === "new" && (
+                    <Input
+                      placeholder="Enter new category"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="mt-2"
+                    />
+                  )}
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="Select a status" />
+                  <Label htmlFor="author">Author</Label>
+                  <Select value={author} onValueChange={setAuthor}>
+                    <SelectTrigger id="author">
+                      <SelectValue placeholder="Select or add an author" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
+                      {authors.map(
+                        (
+                          auth // it should be author id
+                        ) => (
+                          <SelectItem
+                            key={generateHash(auth)}
+                            value={auth.name}
+                          >
+                            {" "}
+                            {auth.name}
+                          </SelectItem>
+                        )
+                      )}
+                      <SelectItem value="new">Add new author...</SelectItem>
                     </SelectContent>
                   </Select>
+                  {author === "new" && (
+                    <div className="space-y-2 mt-2">
+                      <Input
+                        placeholder="Author name"
+                        value={newAuthorName}
+                        onChange={(e) => setNewAuthorName(e.target.value)}
+                      />
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAuthorImageChange}
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                      />
+                      <Textarea
+                        placeholder="Author bio"
+                        value={newAuthorBio}
+                        onChange={(e) => setNewAuthorBio(e.target.value)}
+                        className="h-24"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -371,15 +444,12 @@ export default function NewArticlePage() {
                       <ImageIcon className="h-8 w-8 text-muted-foreground" />
                     )}
                   </div>
-                  <Button type="button" variant="outline" as="label">
-                    Upload Image
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageChange}
-                    />
-                  </Button>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                  />
                 </div>
               </div>
 

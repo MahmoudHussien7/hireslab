@@ -7,26 +7,28 @@ export const fetchArticles = createAsyncThunk(
   "blog/fetchArticles",
   async (_, thunkAPI) => {
     try {
-      const res = await fetch(BASE_URL);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const res = await fetch(BASE_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("Fetch failed:", {
+        console.error("Fetch articles failed:", {
           status: res.status,
           statusText: res.statusText,
           responseText: errorText,
         });
-        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        throw new Error(
+          `Failed to fetch articles: ${res.status} ${res.statusText}`
+        );
       }
 
       const data = await res.json();
-      console.log("Fetched articles successfully:", data);
+      console.log("Fetched articles:", data.data);
       return data.data;
     } catch (error) {
-      console.error("Error fetching articles:", {
-        message: error.message,
-        name: error.name,
-      });
+      console.error("Error fetching articles:", error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -37,7 +39,12 @@ export const fetchSingleArticle = createAsyncThunk(
   "blog/fetchSingleArticle",
   async (id, thunkAPI) => {
     try {
-      const res = await fetch(`${BASE_URL}/${id}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const res = await fetch(`${BASE_URL}/${id}`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -52,13 +59,10 @@ export const fetchSingleArticle = createAsyncThunk(
       }
 
       const data = await res.json();
-      console.log("Fetched single article successfully:", data);
-      return data.data; // Return the nested data object
+      console.log("Fetched single article:", data.data);
+      return data.data;
     } catch (error) {
-      console.error("Error fetching single article:", {
-        message: error.message,
-        name: error.name,
-      });
+      console.error("Error fetching single article:", error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -90,13 +94,10 @@ export const createArticle = createAsyncThunk(
       }
 
       const data = await res.json();
-      console.log("Created article successfully:", data);
-      return data; // Adjust based on API response
+      console.log("Created article:", data.data);
+      return data.data;
     } catch (error) {
-      console.error("Error creating article:", {
-        message: error.message,
-        name: error.name,
-      });
+      console.error("Error creating article:", error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -128,13 +129,10 @@ export const updateArticle = createAsyncThunk(
       }
 
       const data = await res.json();
-      console.log("Updated article successfully:", data);
-      return { id, updatedArticle: data }; // Return the ID and updated article
+      console.log("Updated article:", data.data);
+      return { id, updatedArticle: data.data };
     } catch (error) {
-      console.error("Error updating article:", {
-        message: error.message,
-        name: error.name,
-      });
+      console.error("Error updating article:", error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -161,13 +159,99 @@ export const deleteArticle = createAsyncThunk(
         );
       }
 
-      console.log("Deleted article successfully:", id);
-      return id; // Return the ID of the deleted article
+      console.log("Deleted article:", id);
+      return id;
     } catch (error) {
-      console.error("Error deleting article:", {
-        message: error.message,
-        name: error.name,
-      });
+      console.error("Error deleting article:", error);
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch dynamic categories
+export const fetchCategories = createAsyncThunk(
+  "blog/fetchCategories",
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+      let articles = state.blog.articles;
+      if (articles.length === 0) {
+        const result = await thunkAPI.dispatch(fetchArticles()).unwrap();
+        articles = result;
+      }
+      const categories = [
+        ...new Set(articles.map((article) => article.category).filter(Boolean)),
+      ];
+      console.log("Fetched categories:", categories);
+      return categories;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch dynamic tags
+export const fetchTags = createAsyncThunk(
+  "blog/fetchTags",
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+      let articles = state.blog.articles;
+      if (articles.length === 0) {
+        const result = await thunkAPI.dispatch(fetchArticles()).unwrap();
+        articles = result;
+      }
+      const tags = [
+        ...new Set(
+          articles.flatMap((article) => article.tags || []).filter(Boolean)
+        ),
+      ];
+      console.log("Fetched tags:", tags);
+      return tags;
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+// Fetch dynamic authors
+export const fetchAuthors = createAsyncThunk(
+  "blog/fetchAuthors",
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+      let articles = state.blog.articles;
+      if (articles.length === 0) {
+        const result = await thunkAPI.dispatch(fetchArticles()).unwrap();
+        articles = result;
+      }
+      // Deduplicate authors based on name, image, and about
+      const uniqueAuthors = [];
+      const seen = new Set();
+      for (const article of articles) {
+        if (article.writer?.name) {
+          // Normalize writer fields to avoid subtle differences
+          const writer = {
+            name: article.writer.name.trim(),
+            image:
+              article.writer.image || "/placeholder.svg?height=100&width=100",
+            about: article.writer.about || "No bio available",
+          };
+          const writerKey = JSON.stringify(writer);
+          if (!seen.has(writerKey)) {
+            seen.add(writerKey);
+            uniqueAuthors.push(writer);
+          } else {
+            console.warn(`Duplicate author detected: ${writer.name}`, writer);
+          }
+        }
+      }
+      console.log("Fetched authors:", uniqueAuthors);
+      return uniqueAuthors;
+    } catch (error) {
+      console.error("Error fetching authors:", error);
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -176,6 +260,9 @@ export const deleteArticle = createAsyncThunk(
 const initialState = {
   articles: [],
   singleArticle: null,
+  categories: [],
+  tags: [],
+  authors: [],
   loading: false,
   error: null,
 };
@@ -190,6 +277,7 @@ const blogSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Articles
       .addCase(fetchArticles.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -202,6 +290,7 @@ const blogSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Fetch Single Article
       .addCase(fetchSingleArticle.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -215,6 +304,7 @@ const blogSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Create Article
       .addCase(createArticle.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -227,6 +317,7 @@ const blogSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Update Article
       .addCase(updateArticle.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -246,6 +337,7 @@ const blogSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Delete Article
       .addCase(deleteArticle.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -259,6 +351,45 @@ const blogSlice = createSlice({
         }
       })
       .addCase(deleteArticle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload;
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Tags
+      .addCase(fetchTags.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTags.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tags = action.payload;
+      })
+      .addCase(fetchTags.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Authors
+      .addCase(fetchAuthors.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAuthors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.authors = action.payload;
+      })
+      .addCase(fetchAuthors.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

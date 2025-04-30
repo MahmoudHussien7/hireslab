@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -13,11 +11,48 @@ export default function ArticlesGrid({
 }) {
   // Filter articles based on search query
   const filteredArticles = articles
-    .filter(
-      (article) =>
-        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter((article) => {
+      if (!searchQuery) return true; // Show all if searchQuery is empty
+      const query = searchQuery.toLowerCase().trim();
+      const categoryMatch = article.category?.toLowerCase() === query;
+      const titleMatch = article.title?.toLowerCase().includes(query);
+      const excerptMatch = article.excerpt?.toLowerCase().includes(query);
+      const authorMatch = article.author?.name
+        ?.toLowerCase()
+        ?.trim()
+        ?.includes(query);
+
+      // Log mismatches for debugging
+      if (categoryMatch) {
+        console.log("Category match:", {
+          articleCategory: article.category,
+          searchQuery,
+        });
+      }
+      if (authorMatch) {
+        console.log("Author match:", {
+          authorName: article.author?.name,
+          searchQuery,
+        });
+      }
+      if (!categoryMatch && query === article.category?.toLowerCase()) {
+        console.warn("Category mismatch:", {
+          searchQuery,
+          articleCategory: article.category,
+        });
+      }
+      if (
+        !authorMatch &&
+        article.author?.name?.toLowerCase()?.includes(query)
+      ) {
+        console.warn("Author mismatch:", {
+          searchQuery,
+          authorName: article.author?.name,
+        });
+      }
+
+      return categoryMatch || titleMatch || excerptMatch || authorMatch;
+    })
     // Sort articles by date in descending order (latest first)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
