@@ -1,17 +1,31 @@
+"use client";
+
 import React from 'react';
 import styles from './services.module.css';
+import { motion } from "framer-motion";
 
 export default function ServiceSectionRight({className}) {
   return (
     <section className={`container mx-auto px-10 md:px-12 lg:px-20 flex flex-col md:flex-row-reverse justify-center items-center gap-10 py-16"${className}"`}>
       {/* Image Section */}
-      <div className="flex-1 overflow-hidden flex justify-end items-center">
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="flex-1 overflow-hidden flex justify-end items-center">  
         <div className={`${styles.clip_img} sm:clip-img clip-img bg-cover bg-center bg-no-repeat w-[500px] h-[600px] rounded-lg`} />
-      </div>
+      </motion.div>
 
       {/* Text Section */}
-      <div className="flex-1 flex flex-col justify-center p-2">
-        <p className="text-gray-500">01</p>
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="flex-1 flex flex-col justify-center p-2"
+      >        <p className="text-gray-500">01</p>
         <h3 className="text-2xl font-bold mb-4">Talent audit</h3>
         <p className="mb-6">
           We start a project by building a really clear picture of what is required. To do this we reverse engineer the hiring plan using our IP/Data to create that clarity.
@@ -30,7 +44,7 @@ export default function ServiceSectionRight({className}) {
         </p>
 
         
-      </div>
-    </section>
+        </motion.div>
+        </section>
   );
 }
