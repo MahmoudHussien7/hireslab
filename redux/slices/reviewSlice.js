@@ -1,0 +1,105 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+export const fetchReviews = createAsyncThunk(
+  "reviews/fetchReviews",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("/api/reviews");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch reviews"
+      );
+    }
+  }
+);
+
+export const createReview = createAsyncThunk(
+  "reviews/createReview",
+  async (reviewData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/reviews", reviewData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create review"
+      );
+    }
+  }
+);
+
+export const updateReview = createAsyncThunk(
+  "reviews/updateReview",
+  async ({ id, reviewData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`/api/reviews/${id}`, reviewData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update review"
+      );
+    }
+  }
+);
+
+export const deleteReview = createAsyncThunk(
+  "reviews/deleteReview",
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`/api/reviews/${id}`);
+      return id;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete review"
+      );
+    }
+  }
+);
+
+const reviewSlice = createSlice({
+  name: "reviews",
+  initialState: {
+    reviews: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchReviews.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchReviews.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.reviews = action.payload;
+      })
+      .addCase(fetchReviews.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(createReview.fulfilled, (state, action) => {
+        state.reviews.push(action.payload);
+      })
+      .addCase(updateReview.fulfilled, (state, action) => {
+        const index = state.reviews.findIndex(
+          (review) => review._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.reviews[index] = action.payload;
+        }
+      })
+      .addCase(deleteReview.fulfilled, (state, action) => {
+        state.reviews = state.reviews.filter(
+          (review) => review._id !== action.payload
+        );
+      });
+  },
+});
+
+export const { clearError } = reviewSlice.actions;
+export default reviewSlice.reducer;

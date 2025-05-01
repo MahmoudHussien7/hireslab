@@ -15,7 +15,6 @@ const navLinks = [
   { name: "Community", href: "/community" },
   { name: "Articles", href: "/articles" },
   { name: "Careers", href: "/careers" },
-  { name: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -51,7 +50,7 @@ export default function Navbar() {
       <header
         className={`fixed top-0 w-full z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-gray/90 backdrop-blur-md py-3 shadow-md"
+            ? "bg-gray/80 backdrop-blur-lg py-2 shadow-md"
             : "bg-gray py-5"
         }`}
       >
@@ -138,9 +137,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </header>
-
-      {/* Spacer to prevent content from being hidden under fixed navbar */}
-      <div className={`h-28 ${scrolled ? "h-24" : "h-32"}`}></div>
     </>
   );
 }

@@ -11,6 +11,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  Eye,
+  Star,
+  StarHalf,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -25,6 +28,11 @@ const sidebarItems = [
     title: "Articles",
     href: "/dashboard/articles",
     icon: FileText,
+  },
+  {
+    title: "Reviews",
+    href: "/dashboard/reviews",
+    icon: StarHalf,
   },
   {
     title: "Settings",
