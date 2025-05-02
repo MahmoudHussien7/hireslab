@@ -1,0 +1,27 @@
+"use client"
+import React from 'react';
+import { motion } from 'framer-motion';
+
+export default function HeroCommunity() {
+    return (
+        <section className="container mx-auto min-h-screen px-6 md:px-12 lg:px-20
+         bg-black flex items-center justify-start ">
+            <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+            >
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
+                    <span className="hires-gradient-text">The HiresLab</span><br />
+                    Where Creators Belong
+                </h1>
+                <p className="text-[0.9rem] md:text-xl max-w-2xl text-white">
+                    Join a vibrant collective of thinkers, doers, and dreamers,
+                    this is more than a community—it's a launchpad for innovation, collaboration, and growth.
+                </p>
+            </motion.div>
+        </section>
+    );
+}
+
+{/* <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-purple-400 via-blue-300 to-green-300 opacity-50 blur-3xl"></div> */}
