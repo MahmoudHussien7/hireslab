@@ -6,8 +6,8 @@ import styles from "./services.module.css";
 
 export default function ServicesHero() {
   return (
-    <section className="container mx-auto min-h-screen px-6 md:px-12 lg:px-20 flex flex-col md:flex-row items-center justify-center gap-10 bg-black py-20">
-      
+    <section className="container mx-auto min-h-screen px-6 md:px-12 
+    lg:px-20 flex flex-col md:flex-row items-center justify-center gap-10 bg-black py-20">     
       {/* Left side - Text Content */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}

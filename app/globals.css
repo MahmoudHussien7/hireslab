@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: #000000;
@@ -252,7 +253,16 @@ body {
     --ring: 0 0% 83.1%;
   }
 }
-
+/* Hide buttons from carousel  */
+.slick-prev:before {
+  opacity: 0  !important;
+}
+.slick-next:before {
+  opacity: 0  !important;
+}
+.slick-dots{
+  opacity: 0  !important; 
+}
 .hires-gradient-text {
   @apply bg-gradient-to-r from-[#7ED967] to-[#FFC56D] bg-clip-text text-transparent;
 }
