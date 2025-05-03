@@ -49,9 +49,7 @@ export default function Navbar() {
       <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <header
         className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-          scrolled
-            ? "bg-gray/80 backdrop-blur-lg py-2 shadow-md"
-            : "bg-gray py-5"
+          scrolled ? "bg-black backdrop-blur-lg py-2 shadow-md" : "bg-gray py-5"
         }`}
       >
         <div className="container mx-auto px-16 flex justify-between items-center relative h-20">
@@ -85,7 +83,7 @@ export default function Navbar() {
               className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer"
             >
               <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
-                WORK WITH US
+                Let's talk
               </span>
             </motion.button>
           </nav>
@@ -129,7 +127,7 @@ export default function Navbar() {
                   className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer mt-4"
                 >
                   <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
-                    WORK WITH US
+                    Let's Talk
                   </span>
                 </motion.button>
               </div>

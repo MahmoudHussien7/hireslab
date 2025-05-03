@@ -15,8 +15,8 @@ export default function OurMission() {
       <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6">
         <Target className="text-primary" size={24} />
       </div>
-      <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-      <p className="text-gray-400 mb-4">
+      <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
+      <p className="text-gray-400 text-3xl mb-4">
         To revolutionize the recruitment industry by providing personalized,
         efficient, and effective talent acquisition solutions that create
         lasting value for both candidates and employers.

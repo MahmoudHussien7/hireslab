@@ -16,8 +16,8 @@ export default function OurVision() {
       <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
         <Award className="text-secondary" size={24} />
       </div>
-      <h2 className="text-2xl font-bold mb-4 text-white">Our Vision</h2>
-      <p className="text-gray-400 mb-4">
+      <h2 className="text-4xl font-bold mb-4 text-white">Our Vision</h2>
+      <p className="text-gray-400 text-3xl mb-4">
         To be the most trusted and innovative recruitment partner, known for our
         ability to connect exceptional talent with opportunities where they can
         thrive and make a meaningful impact.

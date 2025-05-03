@@ -63,7 +63,7 @@ export default function CommunitySection() {
               </div>
             </motion.div>
 
-            <Button asChild size="lg" variant="prime">
+            <Button asChild size="lg" variant="community">
               <Link href="/community">Join Now</Link>
             </Button>
           </div>

@@ -19,7 +19,7 @@ export default function AboutCTA() {
             team or advance your career.
           </p>
           <Button size="lg" variant="prime">
-            <Link href="/contact">Contact Us</Link>
+            <Link href="/contact">Let's Talk</Link>
           </Button>
         </div>
       </div>

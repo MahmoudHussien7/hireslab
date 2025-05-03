@@ -62,8 +62,10 @@ export default function Categories({ articles, onCategorySelect }) {
                     <category.icon className="w-6 h-6 text-[#7ED967] mr-2 group-hover:text-[#FFC56D] transition-colors" />
                     <div className="w-12 h-1 bg-gradient-to-r from-[#7ED967] to-[#FFC56D] group-hover:scale-x-125 transition-transform" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{category.name}</h3>
-                  <p className="text-gray-400 text-sm mb-4">
+                  <h3 className="text-xl font-bold text-white mb-2">
+                    {category.name}
+                  </h3>
+                  <p className="text-gray-400 text-sm  mb-4">
                     {category.count} article{category.count !== 1 ? "s" : ""} on{" "}
                     {category.name.toLowerCase()}.
                   </p>
