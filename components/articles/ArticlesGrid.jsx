@@ -23,18 +23,6 @@ export default function ArticlesGrid({
         ?.includes(query);
 
       // Log mismatches for debugging
-      if (categoryMatch) {
-        console.log("Category match:", {
-          articleCategory: article.category,
-          searchQuery,
-        });
-      }
-      if (authorMatch) {
-        console.log("Author match:", {
-          authorName: article.author?.name,
-          searchQuery,
-        });
-      }
       if (!categoryMatch && query === article.category?.toLowerCase()) {
         console.warn("Category mismatch:", {
           searchQuery,
