@@ -1,64 +1,52 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { useEffect, useRef } from "react";
 
 export default function HeroSection() {
   const vantaRef = useRef(null);
+  const vantaEffectRef = useRef(null);
 
   useEffect(() => {
-    // Dynamically load Vanta.js and Three.js scripts
-    const loadScripts = async () => {
-      const threeScript = document.createElement("script");
-      threeScript.src =
-        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js";
-      threeScript.async = true;
-      document.body.appendChild(threeScript);
+    let mounted = true;
 
-      threeScript.onload = () => {
-        const vantaScript = document.createElement("script");
-        vantaScript.src =
-          "https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.dots.min.js";
-        vantaScript.async = true;
-        document.body.appendChild(vantaScript);
+    const loadVanta = async () => {
+      const THREE = await import("three");
+      // Set THREE globally so Vanta can use it
+      if (typeof window !== "undefined") {
+        window.THREE = THREE;
+      }
 
-        vantaScript.onload = () => {
-          if (window.VANTA) {
-            const vantaEffect = window.VANTA.DOTS({
-              el: vantaRef.current,
-              mouseControls: true,
-              touchControls: true,
-              gyroControls: false,
-              minHeight: 200.0,
-              minWidth: 200.0,
-              scale: 1.0,
-              scaleMobile: 1.0,
-              color: 0x7ed967, // Match your brand color
-              backgroundColor: 0x0d1b10, // Match your gradient midpoint
-              size: 2.0,
-              spacing: 20.0,
-            });
+      const VANTA = await import("vanta/dist/vanta.dots.min");
 
-            // Cleanup on component unmount
-            return () => {
-              if (vantaEffect) vantaEffect.destroy();
-            };
-          }
-        };
-      };
+      if (vantaRef.current && !vantaEffectRef.current && mounted) {
+        vantaEffectRef.current = VANTA.default({
+          el: vantaRef.current,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          color: 0x7ed967,
+          backgroundColor: 0x000000,
+          size: 2.0,
+          spacing: 20.0,
+        });
+      }
     };
 
-    loadScripts();
+    loadVanta();
 
-    // Cleanup scripts on unmount
     return () => {
-      const scripts = document.querySelectorAll(
-        'script[src*="three.min.js"], script[src*="vanta.dots.min.js"]'
-      );
-      scripts.forEach((script) => script.remove());
+      mounted = false;
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+      }
     };
   }, []);
 
