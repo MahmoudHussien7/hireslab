@@ -73,6 +73,10 @@ export const createArticle = createAsyncThunk(
   "blog/createArticle",
   async (articleData, thunkAPI) => {
     try {
+      if (!articleData || typeof articleData !== "object") {
+        throw new Error("Invalid article data provided.");
+      }
+
       const res = await fetch(BASE_URL, {
         method: "POST",
         headers: {
@@ -98,7 +102,7 @@ export const createArticle = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error creating article:", error);
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.message || "An unknown error occurred.");
     }
   }
 );

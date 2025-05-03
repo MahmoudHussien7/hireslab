@@ -97,6 +97,7 @@ export default function ArticlesPage() {
     fetchData();
   }, [dispatch]);
 
+  // Filter articles based on search term and category
   const filteredArticles = articles
     .filter((article) => {
       const matchesSearch =
@@ -119,6 +120,7 @@ export default function ArticlesPage() {
       slug: generateSlug(article.name),
     }));
 
+  // Calculate pagination
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedArticles = filteredArticles.slice(
@@ -148,7 +150,7 @@ export default function ArticlesPage() {
   };
 
   return (
-    <div className="space-y-6 min-h-[calc(100vh-4rem)]">
+    <div className="space-y-6 ">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Articles</h2>

@@ -51,7 +51,7 @@ export default function DashboardSidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-gray-900/80 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40  backdrop-blur-sm md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -60,7 +60,7 @@ export default function DashboardSidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-4 left-4 z-50 text-gray-200 hover:bg-gray-700 md:hidden"
+        className="absolute top-4 left-4 z-50 text-gray-200 hover:bg-prime md:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
       >
         <Menu className="h-5 w-5" />
@@ -70,12 +70,12 @@ export default function DashboardSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-800 bg-gray-900 transition-all duration-300 md:static",
+          "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-600 bg-white text-amber-900 transition-all duration-300 md:static",
           collapsed ? "w-[70px]" : "w-[250px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-800">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-500">
           <Link
             href="/dashboard"
             className={cn("flex items-center", collapsed && "justify-center")}
@@ -91,7 +91,7 @@ export default function DashboardSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="hidden text-gray-200 hover:bg-gray-700 md:flex"
+            className="hidden text-black hover:bg-prime md:flex"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? (
@@ -113,7 +113,7 @@ export default function DashboardSidebar() {
                     "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     pathname === item.href
                       ? "bg-prime text-gray-900"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-gray-100",
+                      : "text-gray-800 hover:bg-prime hover:text-gray-100",
                     collapsed && "justify-center px-2"
                   )}
                 >
@@ -135,7 +135,7 @@ export default function DashboardSidebar() {
           <Button
             variant="ghost"
             className={cn(
-              "w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-gray-100",
+              "w-full justify-start text-gray-700 hover:bg-red-700 cursor-pointer hover:text-gray-100",
               collapsed && "justify-center px-2"
             )}
           >
@@ -143,7 +143,7 @@ export default function DashboardSidebar() {
               className={cn(
                 "h-5 w-5",
                 collapsed ? "mr-0" : "mr-2",
-                "text-gray-400"
+                "text-gray-500 hover:bg-red-700"
               )}
             />
             {!collapsed && <span>Logout</span>}
