@@ -12,7 +12,7 @@ export default function LetsTalkSection() {
     <div className="flex flex-row">
       <section
         ref={ref}
-        className="p-16 w-full sm:h-screen sm:max-h-[900px] bg-brand-carbon text-content-light flex  overflow-hiddenpy-20 bg-gradient-to-br from-black   to-black text-white"
+        className="lg:p-16 md:p-12 sm:p-2 w-full sm:h-screen sm:max-h-[900px] bg-brand-carbon text-content-light flex  overflow-hiddenpy-20 bg-gradient-to-br from-black   to-black text-white"
       >
         {/* Background Transition Layer */}
         <motion.div

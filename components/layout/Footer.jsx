@@ -13,7 +13,7 @@ export default function Footer() {
 
   if (isDashboard || is404Page) return null; // 👈 Skip rendering if in dashboard or 404 page
   return (
-    <footer className="p-16 bg-black text-white bg-gradient-to-bl from-black  to-[#0d1b10]">
+    <footer className=" md:px-0 sm:px-0 lg:px-16 bg-black text-white bg-gradient-to-bl from-black  to-[#0d1b10]">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and Social Links */}

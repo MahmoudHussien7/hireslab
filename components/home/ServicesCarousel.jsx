@@ -89,13 +89,13 @@ export default function ServicesCarousel() {
   };
 
   return (
-    <section className="p-16 bg-gradient-to-t from-black to-[#4e4921cf] text-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-block bg-[#7ED967]/20 text-[#7ED967] px-4 py-2 rounded-full text-sm font-medium mb-4">
+    <section className="p-4 sm:p-8 md:p-16 bg-gradient-to-t from-black to-[#4e4921cf] text-white">
+      <div className="container mx-auto px-2 sm:px-4 md:px-4">
+        <div className="text-center mb-6 sm:mb-8 md:mb-12">
+          <div className="inline-block bg-[#7ED967]/20 text-[#7ED967] px-2 sm:px-3 md:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm md:text-base font-medium mb-2 sm:mb-4">
             THE RECRUITING JOURNEY
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
             We help you grow as you embark on your recruiting journey.
           </h2>
         </div>
@@ -112,18 +112,18 @@ export default function ServicesCarousel() {
               transition={{ duration: 0.5 }}
               className="service-carousel-slide"
             >
-              <div className="grid md:grid-cols-2 gap-8 items-center bg-white rounded-2xl p-6 shadow-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 items-center bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
                 {/* Left: Text */}
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-[#1a1a1a]">
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-[#1a1a1a]">
                     {services[currentIndex].title}
                   </h3>
-                  <p className="text-gray-700 mb-6">
+                  <p className="text-gray-700 text-sm sm:text-base mb-4 sm:mb-6">
                     {services[currentIndex].description}
                   </p>
 
-                  <div className="mb-6">
-                    <h4 className="text-sm uppercase tracking-wider mb-3 text-gray-500">
+                  <div className="mb-4 sm:mb-6">
+                    <h4 className="text-xs sm:text-sm uppercase tracking-wider mb-2 sm:mb-3 text-gray-500">
                       FEATURED SERVICES:
                     </h4>
                     <ul className="space-y-2">
@@ -131,9 +131,11 @@ export default function ServicesCarousel() {
                         <li key={idx} className="flex items-start">
                           <CheckCircle
                             className="text-[#7ED967] mr-2 mt-1 flex-shrink-0"
-                            size={16}
+                            size={14}
                           />
-                          <span className="text-[#1a1a1a]">{feature}</span>
+                          <span className="text-[#1a1a1a] text-sm sm:text-base">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -141,13 +143,13 @@ export default function ServicesCarousel() {
                 </div>
 
                 {/* Right: DaisyUI carousel */}
-                <div className="carousel carousel-center bg-neutral rounded-box p-2 space-x-4 max-w-full overflow-x-auto">
+                <div className="carousel carousel-center bg-neutral rounded-box p-1 sm:p-2 space-x-2 sm:space-x-4 max-w-full overflow-x-auto">
                   {services[currentIndex].images.map((img, idx) => (
                     <div key={idx} className="carousel-item">
                       <img
                         src={img}
                         alt={`Slide image ${idx + 1}`}
-                        className="rounded-box h-[260px] w-[400px] object-cover"
+                        className="rounded-box h-40 sm:h-52 md:h-64 w-64 sm:w-80 object-cover"
                       />
                     </div>
                   ))}
@@ -157,21 +159,21 @@ export default function ServicesCarousel() {
           </AnimatePresence>
 
           {/* Controls */}
-          <div className="flex justify-between items-center mt-10 px-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-10 px-2 sm:px-4">
             <Button
               onClick={prevSlide}
               variant="outline"
-              className="border-[#7ED967] text-[#7ED967] hover:bg-[#7ED967]/10 transition"
+              className="border-[#7ED967] text-[#7ED967] hover:bg-[#7ED967]/10 transition w-full sm:w-auto mb-4 sm:mb-0"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={16} />
             </Button>
 
-            <div className="flex space-x-3">
+            <div className="flex space-x-2 sm:space-x-3 mb-4 sm:mb-0">
               {services.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`h-3 w-3 rounded-full transition-all cursor-pointer ${
+                  className={`h-2 sm:h-3 w-2 sm:w-3 rounded-full transition-all cursor-pointer ${
                     index === currentIndex
                       ? "bg-[#7ED967]"
                       : "bg-white/20 hover:bg-white/40"
@@ -183,9 +185,9 @@ export default function ServicesCarousel() {
             <Button
               onClick={nextSlide}
               variant="outline"
-              className="border-[#7ED967] text-[#7ED967] hover:bg-[#7ED967]/10 transition"
+              className="border-[#7ED967] text-[#7ED967] hover:bg-[#7ED967]/10 transition w-full sm:w-auto"
             >
-              <ArrowRight size={20} />
+              <ArrowRight size={16} />
             </Button>
           </div>
         </div>

@@ -52,7 +52,7 @@ export default function Navbar() {
           scrolled ? "bg-black backdrop-blur-lg py-2 shadow-md" : "bg-gray py-5"
         }`}
       >
-        <div className="container mx-auto px-16 flex justify-between items-center relative h-20">
+        <div className="container mx-auto md:px-0 sm:px-0 lg:px-16 flex justify-between items-center relative h-20">
           {/* Logo */}
           <Link href="/" className="z-50">
             <Image

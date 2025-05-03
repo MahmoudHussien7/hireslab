@@ -48,7 +48,6 @@ export const metadata = {
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png", // if you have one
   },
-  manifest: "/site.webmanifest", //  add back the manifest entry
 };
 
 export default function RootLayout({ children }) {
@@ -103,11 +102,14 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`${poppins.variable} font-sans`}>
+      <body
+        className={`${poppins.variable} font-sans`}
+        cz-shortcut-listen="true"
+      >
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="">{children}</main>
             <Footer />
           </div>
         </Providers>
