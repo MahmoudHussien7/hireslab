@@ -5,6 +5,7 @@ import StatsSection from "@/components/home/StatsSection";
 import CommunitySection from "@/components/home/CommunitySection";
 import Newsletter from "@/components/home/Newsletter";
 import LetsTalkSection from "@/components/home/LetsTalkSection";
+import CarouselBrand from "@/components/services/CarouselBrand";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <ServicesCarousel />
       <StatsSection />
       <LetsTalkSection />
+      <CarouselBrand />
       <CommunitySection />
       <Newsletter />
     </>
