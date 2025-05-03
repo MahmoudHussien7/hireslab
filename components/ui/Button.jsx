@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         prime:
-          "bg-gradient-to-r from-[#ffdba1] to-[#ffc56d] hover:from-[#ffc56d] hover:to-[#ffdba1] text-white shadow-md",
+          "bg-gradient-to-r from-[#ffdba1] to-[#ffc56d] hover:from-[#ffc56d] hover:to-[#ffdba1] text-black shadow-md",
         community:
           "bg-gradient-to-r from-[gray] to-[#ffdba1] hover:from-[#ffdba1] hover:to-[#000000] text-white shadow-md",
         default: "bg-[#7ED967] text-black hover:bg-[#7ED967]/90",
