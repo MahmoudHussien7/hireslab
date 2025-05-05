@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -49,9 +49,13 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const router = useRouter();
-  const token = useSelector((state) => state.auth.token);
+
+  const handleLogOut = () => {
+    dispatch(logOut());
+    navigate("/"); // Redirect to the homepage after logout
+  };
 
   useEffect(() => {
     const storedToken = Cookies.get("token");
@@ -146,7 +150,10 @@ export default function DashboardSidebar() {
 
         <div className="border-t border-gray-800 p-4">
           <Button
-            onClick={() => dispatch(logout())}
+            onClick={() => {
+              dispatch(logout());
+              router.push("/auth/signin");
+            }}
             variant="ghost"
             className={cn(
               "w-full justify-start text-gray-700 hover:bg-red-700 cursor-pointer hover:text-gray-100",

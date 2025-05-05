@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 const BASE_URL = "https://hires-lab.glitch.me/api/articles";
 
@@ -25,7 +26,7 @@ export const fetchArticles = createAsyncThunk(
       }
 
       const data = await res.json();
-
+      console.log("Fetched articles:", data.data);
       return data.data;
     } catch (error) {
       console.error("Error fetching articles:", error);
@@ -59,7 +60,7 @@ export const fetchSingleArticle = createAsyncThunk(
       }
 
       const data = await res.json();
-
+      console.log("Fetched single article:", data.data);
       return data.data;
     } catch (error) {
       console.error("Error fetching single article:", error);
@@ -73,14 +74,14 @@ export const createArticle = createAsyncThunk(
   "blog/createArticle",
   async (articleData, thunkAPI) => {
     try {
-      if (!articleData || typeof articleData !== "object") {
-        throw new Error("Invalid article data provided.");
-      }
+      const state = thunkAPI.getState(); // بنجيب الstate
+      const token = Cookies.get("token"); // ✅ Correct way to get token
 
       const res = await fetch(BASE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ Authorization header
         },
         body: JSON.stringify(articleData),
       });
@@ -98,13 +99,11 @@ export const createArticle = createAsyncThunk(
       }
 
       const data = await res.json();
-
+      console.log("Created article:", data.data);
       return data.data;
     } catch (error) {
       console.error("Error creating article:", error);
-      return thunkAPI.rejectWithValue(
-        error.message || "An unknown error occurred."
-      );
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
@@ -114,10 +113,14 @@ export const updateArticle = createAsyncThunk(
   "blog/updateArticle",
   async ({ id, articleData }, thunkAPI) => {
     try {
+      const state = thunkAPI.getState(); // بنجيب الstate
+      const token = Cookies.get("token"); // ✅ Correct way to get token
+
       const res = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(articleData),
       });
@@ -135,6 +138,7 @@ export const updateArticle = createAsyncThunk(
       }
 
       const data = await res.json();
+      console.log("Updated article:", data.data);
       return { id, updatedArticle: data.data };
     } catch (error) {
       console.error("Error updating article:", error);
@@ -148,8 +152,12 @@ export const deleteArticle = createAsyncThunk(
   "blog/deleteArticle",
   async (id, thunkAPI) => {
     try {
+      const token = Cookies.get("token");
       const res = await fetch(`${BASE_URL}/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) {
@@ -164,6 +172,7 @@ export const deleteArticle = createAsyncThunk(
         );
       }
 
+      console.log("Deleted article:", id);
       return id;
     } catch (error) {
       console.error("Error deleting article:", error);
@@ -186,6 +195,7 @@ export const fetchCategories = createAsyncThunk(
       const categories = [
         ...new Set(articles.map((article) => article.category).filter(Boolean)),
       ];
+      console.log("Fetched categories:", categories);
       return categories;
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -210,6 +220,7 @@ export const fetchTags = createAsyncThunk(
           articles.flatMap((article) => article.tags || []).filter(Boolean)
         ),
       ];
+      console.log("Fetched tags:", tags);
       return tags;
     } catch (error) {
       console.error("Error fetching tags:", error);
@@ -250,6 +261,7 @@ export const fetchAuthors = createAsyncThunk(
           }
         }
       }
+      console.log("Fetched authors:", uniqueAuthors);
       return uniqueAuthors;
     } catch (error) {
       console.error("Error fetching authors:", error);
