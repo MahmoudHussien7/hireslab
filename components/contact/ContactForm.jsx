@@ -1,3 +1,4 @@
+// ContactForm.jsx
 import {
   Phone,
   Mail,
@@ -19,6 +20,9 @@ export default function ContactForm({
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
+    cv: null, // Change to null to store file object
+    role: "",
     subject: "",
     message: "",
   },
@@ -78,6 +82,12 @@ export default function ContactForm({
     if (Object.keys(newErrors).length === 0) {
       onSubmit(e);
     }
+  };
+
+  // Handle file input change
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    onChange({ target: { name: "cv", value: file } });
   };
 
   return (
@@ -177,7 +187,7 @@ export default function ContactForm({
                 />
               </label>
               {errors.firstName && (
-                <p className="text-red-400 text-xsMT-1">{errors.firstName}</p>
+                <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>
               )}
             </div>
             <div className="w-full">
@@ -229,7 +239,19 @@ export default function ContactForm({
               Looking for: <span className="text-white">{lookingFor}</span>
             </label>
           </div>
-
+          <div className="w-full">
+            <label className="text-gray-400 block mb-1">
+              Upload CV (Optional)
+            </label>
+            <input
+              type="file"
+              name="cv"
+              onChange={handleFileChange} // Use dedicated file handler
+              disabled={loading}
+              accept=".pdf,.doc,.docx" // Restrict to common CV file types
+              className="file-input w-full text-white bg-gray-800 border-gray-600"
+            />
+          </div>
           <div className="w-full">
             <label className="floating-label">
               <span className="text-gray-400">Message*</span>

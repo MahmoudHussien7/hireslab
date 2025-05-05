@@ -1,25 +1,21 @@
-// src/redux/contactSlice.js
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-// async thunk to submit contact form
+// Async thunk to submit contact form
 export const submitContact = createAsyncThunk(
   "contact/submitContact",
-  async (contactData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
       const response = await fetch(
         "https://hires-lab.glitch.me/api/contacts/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(contactData),
+          body: formData, // Send FormData directly
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to submit form");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit form");
       }
 
       return await response.json();

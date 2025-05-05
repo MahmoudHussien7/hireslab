@@ -1,3 +1,4 @@
+// ContactUs.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,6 +20,8 @@ export default function ContactUs() {
     lastName: "",
     email: "",
     phone: "",
+    cv: null, // Store file object
+    role: "",
     subject: "",
     message: "",
   });
@@ -32,6 +35,8 @@ export default function ContactUs() {
         lastName: "",
         email: "",
         phone: "",
+        cv: null, // Reset CV
+        role: "",
         subject: "",
         message: "",
       });
@@ -55,14 +60,31 @@ export default function ContactUs() {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "cv") {
+      // Handle file input
+      setFormData((prev) => ({ ...prev, cv: value }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Create FormData object for multipart form submission
+    const submissionData = new FormData();
+    submissionData.append("firstName", formData.firstName);
+    submissionData.append("lastName", formData.lastName);
+    submissionData.append("email", formData.email);
+    submissionData.append("phone", formData.phone);
+    if (formData.cv) {
+      submissionData.append("cv", formData.cv); // Append CV file
+    }
+    submissionData.append("role", role);
+    submissionData.append("subject", lookingFor);
+    submissionData.append("message", formData.message);
+
     // Optimistically set success state
     setOptimisticSuccess(true);
-    const submissionData = { ...formData, subject: lookingFor };
     dispatch(submitContact(submissionData));
   };
 
