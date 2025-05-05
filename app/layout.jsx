@@ -8,12 +8,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import LayoutWrapper from "./LayoutWrapper";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
-});
-
 export const metadata = {
   title: "The Hires Lab",
   description: "Recruitment and HR solutions for your business",
@@ -28,7 +22,7 @@ export const metadata = {
     siteName: "The Hires Lab",
     images: [
       {
-        url: "https://thehireslab.com/og-image.jpg", 
+        url: "https://thehireslab.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "The Hires Lab",
@@ -103,18 +97,13 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body
-        className={`${poppins.variable} font-sans`}
-        cz-shortcut-listen="true"
-      >
+      <body cz-shortcut-listen="true">
         <Providers>
           <div className="flex min-h-screen flex-col">
             {/* <Navbar /> */}
             <main className="">
-            <LayoutWrapper>
-              {children}
-              </LayoutWrapper>
-              </main>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </main>
             {/* <Footer /> */}
           </div>
         </Providers>
