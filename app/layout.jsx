@@ -27,7 +27,7 @@ export const metadata = {
     siteName: "The Hires Lab",
     images: [
       {
-        url: "https://thehireslab.com/og-image.jpg", // replace with your actual image URL
+        url: "https://thehireslab.com/og-image.jpg", 
         width: 1200,
         height: 630,
         alt: "The Hires Lab",

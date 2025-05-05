@@ -70,7 +70,7 @@ export default function DashboardSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-600 bg-white text-amber-900 transition-all duration-300 md:static",
+          "fixed inset-y-0 left-0 z-40 flex flex-col border-r border-gray-600  text-amber-900 transition-all duration-300 md:static",
           collapsed ? "w-[70px]" : "w-[250px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}

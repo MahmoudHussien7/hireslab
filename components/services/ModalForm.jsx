@@ -45,13 +45,12 @@ const schema = yup.object().shape({
 
   message: yup.string(),
 
-  compnay: yup.string(), 
+  compnay: yup.string(),
 
-  cv: yup.string(),      
+  cv: yup.string(),
 
-  role: yup.string()  
+  role: yup.string(),
 });
-
 
 export default function ModalForm({ isOpen, onClose }) {
   const dispatch = useDispatch();
@@ -70,25 +69,25 @@ export default function ModalForm({ isOpen, onClose }) {
   // onSubmit handler
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    dispatch(submitContact(data)); 
-    reset(); 
-    onClose(); 
+    dispatch(submitContact(data));
+    reset();
+    onClose();
   };
 
   useEffect(() => {
     if (success) {
       console.log("Your message has been sent successfully!");
-      reset(); 
+      reset();
       dispatch(resetStatus());
-      onClose(); 
+      onClose();
     }
-  
+
     if (error) {
       console.log("Something went wrong: " + error);
       dispatch(resetStatus());
     }
   }, [success, error, dispatch, reset, onClose]);
-  
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -101,7 +100,7 @@ export default function ModalForm({ isOpen, onClose }) {
             className="bg-neutral-900 px-20 py-5 rounded-lg max-w-2xl w-full overflow-auto max-h-[100vh]"
           >
             {/* Close button */}
-            <div className="flex justify-start pb-20">
+            <div className="flex justify-start pb-20 mt-20">
               <button
                 onClick={onClose}
                 className="text-white font-bold text-md cursor-pointer"
@@ -151,7 +150,9 @@ export default function ModalForm({ isOpen, onClose }) {
                     className="input bg-transparent text-white border border-b-white text-[1.1rem] w-full"
                   />
                   {errors.firstName && (
-                    <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.firstName.message}
+                    </p>
                   )}
                 </label>
 
@@ -163,7 +164,9 @@ export default function ModalForm({ isOpen, onClose }) {
                     className="input bg-transparent text-white border border-b-white text-[1.1rem] w-full"
                   />
                   {errors.lastName && (
-                    <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.lastName.message}
+                    </p>
                   )}
                 </label>
               </div>
@@ -200,7 +203,9 @@ export default function ModalForm({ isOpen, onClose }) {
                   className="input bg-transparent text-white border border-b-white text-[1.1rem] w-full"
                 />
                 {errors.subject && (
-                  <p className="text-red-500 text-sm">{errors.subject.message}</p>
+                  <p className="text-red-500 text-sm">
+                    {errors.subject.message}
+                  </p>
                 )}
               </label>
 
@@ -212,7 +217,9 @@ export default function ModalForm({ isOpen, onClose }) {
                   className="textarea border border-b-white text-white h-24 w-full bg-transparent"
                 ></textarea>
                 {errors.message && (
-                  <p className="text-red-500 text-sm">{errors.message.message}</p>
+                  <p className="text-red-500 text-sm">
+                    {errors.message.message}
+                  </p>
                 )}
               </fieldset>
 
