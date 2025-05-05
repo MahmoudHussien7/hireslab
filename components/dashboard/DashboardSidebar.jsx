@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useDispatch,useSelector } from "react-redux";
+import { logout } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const sidebarItems = [
   {
@@ -45,7 +49,16 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const dispatch=useDispatch();
+  const router = useRouter();
+  const token = useSelector((state) => state.auth.token);
 
+  useEffect(() => {
+    const storedToken = Cookies.get("token");
+    if (!storedToken) {
+      router.push("/auth/signin");
+    }
+  }, []);
   return (
     <>
       {/* Mobile overlay */}
@@ -133,6 +146,7 @@ export default function DashboardSidebar() {
 
         <div className="border-t border-gray-800 p-4">
           <Button
+            onClick={() => dispatch(logout())}
             variant="ghost"
             className={cn(
               "w-full justify-start text-gray-700 hover:bg-red-700 cursor-pointer hover:text-gray-100",
