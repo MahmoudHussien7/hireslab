@@ -6,6 +6,7 @@ import Providers from "@/app/Provider";
 import Script from "next/script";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import LayoutWrapper from "./LayoutWrapper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -108,9 +109,13 @@ export default function RootLayout({ children }) {
       >
         <Providers>
           <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="">{children}</main>
-            <Footer />
+            {/* <Navbar /> */}
+            <main className="">
+            <LayoutWrapper>
+              {children}
+              </LayoutWrapper>
+              </main>
+            {/* <Footer /> */}
           </div>
         </Providers>
       </body>
