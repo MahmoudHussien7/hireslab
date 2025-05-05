@@ -7,7 +7,7 @@ import { Mail } from "lucide-react";
 
 export default function Newsletter() {
   return (
-    <section className="p-4 sm:p-8 md:p-16 bg-gradient-to-tr from-gray-100 via-white to-[#f0fff4]">
+    <section className="p-4 sm:p-8 md:p-16 bg-white">
       <div className="container mx-auto px-2 sm:px-4 md:px-4 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

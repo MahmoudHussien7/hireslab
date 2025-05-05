@@ -19,15 +19,15 @@ const navLinks = [
 
 export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [rotateDeg, setRotateDeg] = useState(0);
+
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
 
   // Skip rendering if in dashboard
   if (isDashboard) return null;
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [rotateDeg, setRotateDeg] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,64 +41,80 @@ export default function Navbar() {
 
   const handleWorkWithUsClick = () => {
     setIsModalOpen(true);
-    if (isOpen) setIsOpen(false);
+    if (isOpen) setIsOpen(false); // Close mobile menu if open
   };
+
+  // Prevent body scrolling when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
     <>
       <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
       <header
-        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-          scrolled ? "bg-black backdrop-blur-lg py-2 shadow-md" : "bg-gray py-5"
+        className={`fixed top-0 w-full z-50 transition-all ease-in-out duration-300 ${
+          scrolled
+            ? "bg-black/80 backdrop-blur-md py-2 shadow-md"
+            : "bg-transparent py-4"
         }`}
       >
-        <div className="container mx-auto md:px-0 sm:px-0 lg:px-16 flex justify-between items-center relative h-20">
+        <div className="container mx-auto flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-10 h-16 sm:h-20">
           {/* Logo */}
-          <Link href="/" className="z-50">
+          <Link href="/" className="z-50 flex-shrink-0">
             <Image
               src="/images/logo.png"
-              width={150}
-              height={50}
+              width={120}
+              height={40}
               alt="Logo"
-              className="flex items-center"
+              className="h-auto w-auto object-contain"
+              sizes="(max-width: 640px) 100px, (max-width: 1024px) 120px, 150px"
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center justify-center space-x-6">
+          {/* Desktop Menu */}
+          <nav className="hidden md:flex items-center space-x-4 sm:space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="px-4 py-2 text-base text-white hover:text-accent transition-colors"
+                className="text-white text-sm sm:text-base px-2 sm:px-3 py-1 hover:text-accent transition-colors"
               >
                 {link.name}
               </Link>
             ))}
 
-            {/* Work With Us Button - Desktop */}
             <motion.button
               onClick={handleWorkWithUsClick}
               style={{ rotate: rotateDeg }}
-              className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer"
+              className="flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-zaza text-white shadow-lg ml-4"
+              aria-label="Contact us"
             >
-              <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
-                Let's talk
+              <span className="text-[8px] sm:text-[10px] font-medium tracking-widest text-center leading-tight">
+                Let's Talk
               </span>
             </motion.button>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white z-50"
             onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden text-white z-50 p-1"
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -106,31 +122,29 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden fixed inset-0 bg-gray/95 backdrop-blur-md z-40 flex items-center justify-center"
+              className="fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-6 sm:space-y-8"
             >
-              <div className="container flex flex-col items-center space-y-6 py-20">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="px-4 py-2 text-xl text-white hover:text-accent transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-
-                {/* Work With Us Button - Mobile (same as desktop) */}
-                <motion.button
-                  onClick={handleWorkWithUsClick}
-                  style={{ rotate: rotateDeg }}
-                  className="flex items-center justify-center w-20 h-20 rounded-full bg-zaza text-white shadow-lg cursor-pointer mt-4"
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-white text-xl sm:text-2xl py-2 hover:text-accent"
                 >
-                  <span className="text-[10px] font-medium tracking-widest text-center leading-tight">
-                    Let's Talk
-                  </span>
-                </motion.button>
-              </div>
+                  {link.name}
+                </Link>
+              ))}
+
+              <motion.button
+                onClick={handleWorkWithUsClick}
+                style={{ rotate: rotateDeg }}
+                className="flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-zaza text-white shadow-lg mt-6"
+                aria-label="Contact us"
+              >
+                <span className="text-[8px] sm:text-[10px] font-medium tracking-widest text-center leading-tight">
+                  Let's Talk
+                </span>
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
