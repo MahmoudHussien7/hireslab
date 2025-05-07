@@ -48,8 +48,8 @@ export default function CarouselBrand() {
   };
 
   return (
-    <div className="w-full py-5 px-4 md:px-10">
-      <Slider {...settings} className="w-full max-w-6xl mx-auto">
+    <div className="w-full overflow-hidden px-4 md:px-10 sm:px-12 lg:px-16 xl:px-20 bg-white dark:bg-gray-900">
+      <Slider {...settings} className="w-full  mx-auto ">
         {items.map((item, index) => (
           <div key={index} className="flex justify-center items-center px-2">
             <div className="relative w-[120px] h-[80px] sm:w-[150px] sm:h-[100px]">
