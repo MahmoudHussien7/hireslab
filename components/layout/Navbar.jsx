@@ -67,7 +67,7 @@ export default function Navbar() {
             : "bg-transparent py-4"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-10 h-16 sm:h-20">
+        <div className="container flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-10 h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="z-50 flex-shrink-0">
             <Image
@@ -81,7 +81,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center space-x-4 sm:space-x-6">
+          <nav className="hidden md:flex items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -107,7 +107,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-white z-50 p-1"
+            className="md:hidden text-white z-50 "
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -122,7 +122,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-6 sm:space-y-8"
+              className="fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex w-auto flex-col items-center justify-center space-y-6 sm:space-y-8"
             >
               {navLinks.map((link) => (
                 <Link
