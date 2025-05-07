@@ -26,25 +26,25 @@ export default function Navbar() {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
 
-  // Skip rendering if in dashboard
   if (isDashboard) return null;
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-      setRotateDeg(window.scrollY * 0.2);
+      if (!isOpen) {
+        setScrolled(window.scrollY > 10);
+        setRotateDeg(window.scrollY * 0.2);
+      }
     };
-
+    handleScroll(); // initialize on mount
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isOpen]);
 
   const handleWorkWithUsClick = () => {
     setIsModalOpen(true);
-    if (isOpen) setIsOpen(false); // Close mobile menu if open
+    setIsOpen(false);
   };
 
-  // Prevent body scrolling when mobile menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -61,13 +61,13 @@ export default function Navbar() {
       <ModalForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       <header
-        className={`fixed top-0 w-full z-50 transition-all ease-in-out duration-300 ${
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ease-in-out ${
           scrolled
             ? "bg-black/80 backdrop-blur-md py-2 shadow-md"
             : "bg-transparent py-4"
         }`}
       >
-        <div className="container flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-10 h-16 sm:h-20">
+        <div className="container flex items-center justify-between px-4 sm:px-6 lg:px-10 h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="z-50 flex-shrink-0">
             <Image
@@ -80,21 +80,28 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Menu */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-white text-sm sm:text-base px-2 sm:px-3 py-1 hover:text-accent transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-sm sm:text-base px-2 sm:px-3 py-1 transition-colors ${
+                    isActive
+                      ? "text-accent font-semibold"
+                      : "text-white hover:text-accent"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
 
             <motion.button
               onClick={handleWorkWithUsClick}
-              style={{ rotate: rotateDeg }}
+              style={{ rotate: isOpen ? 0 : rotateDeg }}
               className="flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-zaza text-white shadow-lg ml-4"
               aria-label="Contact us"
             >
@@ -104,10 +111,10 @@ export default function Navbar() {
             </motion.button>
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Hamburger */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-white z-50 "
+            className="md:hidden text-white z-[60]"
             aria-label="Toggle menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -118,27 +125,34 @@ export default function Navbar() {
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/95 backdrop-blur-md z-40 flex w-auto flex-col items-center justify-center space-y-6 sm:space-y-8"
+              className="fixed top-0 left-0 w-full h-screen bg-black/95 backdrop-blur-md z-40 flex flex-col items-center justify-center space-y-6 sm:space-y-8 px-4"
             >
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-white text-xl sm:text-2xl py-2 hover:text-accent"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`text-xl sm:text-2xl py-2 transition-colors ${
+                      isActive
+                        ? "text-accent font-semibold"
+                        : "text-white hover:text-accent"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
 
               <motion.button
                 onClick={handleWorkWithUsClick}
-                style={{ rotate: rotateDeg }}
-                className="flex items-center justify-center w-16 sm:w-20 h-16 sm:h-20 rounded-full bg-zaza text-white shadow-lg mt-6"
+                style={{ rotate: isOpen ? 0 : rotateDeg }}
+                className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-zaza text-white shadow-lg"
                 aria-label="Contact us"
               >
                 <span className="text-[8px] sm:text-[10px] font-medium tracking-widest text-center leading-tight">
