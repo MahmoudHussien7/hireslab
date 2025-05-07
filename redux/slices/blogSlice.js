@@ -9,7 +9,7 @@ export const fetchArticles = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch(BASE_URL, { signal: controller.signal });
       clearTimeout(timeoutId);
 
@@ -72,18 +72,16 @@ export const fetchSingleArticle = createAsyncThunk(
 // Create a new article
 export const createArticle = createAsyncThunk(
   "blog/createArticle",
-  async (articleData, thunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
-      const state = thunkAPI.getState(); // بنجيب الstate
-      const token = Cookies.get("token"); // ✅ Correct way to get token
+      const token = Cookies.get("token");
 
       const res = await fetch(BASE_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ Authorization header
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(articleData),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -113,8 +111,7 @@ export const updateArticle = createAsyncThunk(
   "blog/updateArticle",
   async ({ id, articleData }, thunkAPI) => {
     try {
-      const state = thunkAPI.getState(); // بنجيب الstate
-      const token = Cookies.get("token"); // ✅ Correct way to get token
+      const token = Cookies.get("token");
 
       const res = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
@@ -240,12 +237,10 @@ export const fetchAuthors = createAsyncThunk(
         const result = await thunkAPI.dispatch(fetchArticles()).unwrap();
         articles = result;
       }
-      // Deduplicate authors based on name, image, and about
       const uniqueAuthors = [];
       const seen = new Set();
       for (const article of articles) {
         if (article.writer?.name) {
-          // Normalize writer fields to avoid subtle differences
           const writer = {
             name: article.writer.name.trim(),
             image:

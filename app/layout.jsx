@@ -14,7 +14,6 @@ export const metadata = {
   keywords: ["Recruitment", "HR", "Hiring", "Talent acquisition", "Hires Lab"],
   authors: [{ name: "The Hires Lab", url: "https://thehireslab.com" }],
   creator: "The Hires Lab",
-  themeColor: "#7ED967",
   openGraph: {
     title: "The Hires Lab",
     description: "Recruitment and HR solutions for your business",

@@ -24,6 +24,7 @@ import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
+import Cookies from "js-cookie";
 import {
   createArticle,
   fetchCategories,
@@ -43,6 +44,7 @@ const generateHash = (obj) => {
   return hash.toString();
 };
 
+// Estimate reading time based on content
 const estimateReadingTime = (content) => {
   const wordsPerMinute = 200;
   const text = content.replace(/<[^>]*>/g, "");
@@ -51,11 +53,26 @@ const estimateReadingTime = (content) => {
   return `${minutes} min read`;
 };
 
+// Strip HTML and truncate for excerpt
 const stripHtmlAndTruncate = (html, maxLength = 100) => {
   const text = html.replace(/<[^>]*>/g, "");
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
+// Validate image URL
+const isValidImageUrl = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    return (
+      parsedUrl.hostname !== "www.google.com" &&
+      /\.(jpg|jpeg|png|gif|webp)$/i.test(parsedUrl.pathname)
+    );
+  } catch {
+    return false;
+  }
+};
+
+// Toolbar component for Tiptap editor
 const Toolbar = ({ editor }) => {
   const linkInputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -175,16 +192,20 @@ const Toolbar = ({ editor }) => {
         {colorPickerOpen && (
           <div className="absolute z-10 mt-2 p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg">
             <div className="flex gap-2">
-              {["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"].map(
-                (color) => (
-                  <button
-                    key={color}
-                    onClick={() => setColor(color)}
-                    className="w-6 h-6 rounded-full border border-gray-300"
-                    style={{ backgroundColor: color }}
-                  />
-                )
-              )}
+              {[
+                "#000000",
+                "#FF0000",
+                "#00FF00",
+                "#0000 habitantsFF",
+                "#FFFF00",
+              ].map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setColor(color)}
+                  className="w-6 h-6 rounded-full border border-gray-300"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -204,7 +225,8 @@ const Toolbar = ({ editor }) => {
 };
 
 export default function NewArticlePage() {
-  const [title, setTitle] = useState("");
+  const [name, setName] = useState("");
+  const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [tags, setTags] = useState("");
@@ -215,6 +237,8 @@ export default function NewArticlePage() {
   const [newAuthorImage, setNewAuthorImage] = useState("");
   const [newAuthorBio, setNewAuthorBio] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [authorImageError, setAuthorImageError] = useState("");
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -250,8 +274,11 @@ export default function NewArticlePage() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
+        setImageError("");
       };
       reader.readAsDataURL(file);
+    } else {
+      setImageError("Please select a valid image file.");
     }
   };
 
@@ -261,18 +288,40 @@ export default function NewArticlePage() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setNewAuthorImage(reader.result);
+        setAuthorImageError("");
       };
       reader.readAsDataURL(file);
+    } else {
+      setAuthorImageError("Please select a valid image file.");
+    }
+  };
+
+  const handleAuthorImageUrlChange = (e) => {
+    const url = e.target.value;
+    if (url === "" || isValidImageUrl(url)) {
+      setNewAuthorImage(url);
+      setAuthorImageError("");
+    } else {
+      setAuthorImageError(
+        "Please enter a valid image URL (e.g., ending in .jpg, .png) and not a Google redirect."
+      );
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let imageUrl = "";
-    if (imageFile) {
-      // Mock upload (replace with actual API call)
-      imageUrl = "/images/uploaded-image.jpg";
+    if (!imageFile || imageFile.size === 0) {
+      setImageError("Please select an image file.");
+      return;
+    }
+
+    if (
+      author === "new" &&
+      (!newAuthorName || !newAuthorImage || !newAuthorBio)
+    ) {
+      setAuthorImageError("Please fill in all author fields.");
+      return;
     }
 
     const content = editor ? editor.getHTML() : "";
@@ -291,26 +340,27 @@ export default function NewArticlePage() {
             about: "No bio available.",
           };
 
-    const articleData = {
-      name: title,
-      content,
-      writer,
-      date: new Date().toISOString(),
-      readingTime: estimateReadingTime(content),
-      image: imageUrl || "/placeholder.svg?height=400&width=600",
-      category: newCategory || category || "General",
-      tags: tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag),
-      excerpt: generatedExcerpt,
-    };
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("date", date || new Date().toISOString().split("T")[0]);
+    formData.append("readingTime", estimateReadingTime(content));
+    formData.append("content", content);
+    formData.append("writer", JSON.stringify(writer));
+    const tagArray = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag);
+    formData.append("tags", JSON.stringify(tagArray));
+    formData.append("category", newCategory || category || "General");
+    formData.append("image", imageFile);
+    formData.append("excerpt", generatedExcerpt);
 
     try {
-      await dispatch(createArticle(articleData)).unwrap();
+      await dispatch(createArticle(formData)).unwrap();
       router.push("/dashboard/articles");
     } catch (err) {
       console.error("Failed to create article:", err);
+      alert("Something went wrong.");
     }
   };
 
@@ -347,12 +397,23 @@ export default function NewArticlePage() {
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="name">Title</Label>
                 <Input
-                  id="title"
+                  id="name"
                   placeholder="Enter article title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                   required
                 />
               </div>
@@ -390,19 +451,11 @@ export default function NewArticlePage() {
                       <SelectValue placeholder="Select or add an author" />
                     </SelectTrigger>
                     <SelectContent>
-                      {authors.map(
-                        (
-                          auth // it should be author id
-                        ) => (
-                          <SelectItem
-                            key={generateHash(auth)}
-                            value={auth.name}
-                          >
-                            {" "}
-                            {auth.name}
-                          </SelectItem>
-                        )
-                      )}
+                      {authors.map((auth) => (
+                        <SelectItem key={generateHash(auth)} value={auth.name}>
+                          {auth.name}
+                        </SelectItem>
+                      ))}
                       <SelectItem value="new">Add new author...</SelectItem>
                     </SelectContent>
                   </Select>
@@ -412,7 +465,19 @@ export default function NewArticlePage() {
                         placeholder="Author name"
                         value={newAuthorName}
                         onChange={(e) => setNewAuthorName(e.target.value)}
+                        required
                       />
+                      <Input
+                        placeholder="Author image URL"
+                        value={newAuthorImage}
+                        onChange={handleAuthorImageUrlChange}
+                        required
+                      />
+                      {authorImageError && (
+                        <p className="text-sm text-red-600">
+                          {authorImageError}
+                        </p>
+                      )}
                       <Input
                         type="file"
                         accept="image/*"
@@ -424,6 +489,7 @@ export default function NewArticlePage() {
                         value={newAuthorBio}
                         onChange={(e) => setNewAuthorBio(e.target.value)}
                         className="h-24"
+                        required
                       />
                     </div>
                   )}
@@ -431,7 +497,7 @@ export default function NewArticlePage() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="featured-image">Featured Image</Label>
+                <Label htmlFor="image">Featured Image</Label>
                 <div className="flex items-center gap-4">
                   <div className="h-32 w-32 rounded-md border border-dashed border-border flex items-center justify-center bg-muted">
                     {imagePreview ? (
@@ -445,12 +511,17 @@ export default function NewArticlePage() {
                     )}
                   </div>
                   <Input
+                    id="image"
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
                     className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                    required
                   />
                 </div>
+                {imageError && (
+                  <p className="text-sm text-red-600">{imageError}</p>
+                )}
               </div>
 
               <div className="grid gap-2">
