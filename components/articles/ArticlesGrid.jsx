@@ -80,7 +80,7 @@ export default function ArticlesGrid({
                     }
                     alt={article.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="object-fill transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute top-4 left-4 z-20">
                     <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white">

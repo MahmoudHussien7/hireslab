@@ -2,9 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { Save, X, ImageIcon, Link as LinkIcon, Palette } from "lucide-react";
+import {
+  Save,
+  X,
+  ImageIcon,
+  Link as LinkIcon,
+  Palette,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,9 +32,10 @@ import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
 import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
-import Cookies from "js-cookie";
 import {
   createArticle,
+  updateArticle,
+  fetchSingleArticle,
   fetchCategories,
   fetchTags,
   fetchAuthors,
@@ -192,20 +201,16 @@ const Toolbar = ({ editor }) => {
         {colorPickerOpen && (
           <div className="absolute z-10 mt-2 p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg">
             <div className="flex gap-2">
-              {[
-                "#000000",
-                "#FF0000",
-                "#00FF00",
-                "#0000 habitantsFF",
-                "#FFFF00",
-              ].map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setColor(color)}
-                  className="w-6 h-6 rounded-full border border-gray-300"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+              {["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"].map(
+                (color) => (
+                  <button
+                    key={color}
+                    onClick={() => setColor(color)}
+                    className="w-6 h-6 rounded-full border border-gray-300"
+                    style={{ backgroundColor: color }}
+                  />
+                )
+              )}
             </div>
           </div>
         )}
@@ -229,7 +234,7 @@ export default function NewArticlePage() {
   const [date, setDate] = useState("");
   const [category, setCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState([""]); // Initialize with one empty tag input
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [author, setAuthor] = useState("");
@@ -242,19 +247,15 @@ export default function NewArticlePage() {
 
   const dispatch = useDispatch();
   const router = useRouter();
+  const { id } = useParams();
   const {
+    singleArticle,
     categories,
     tags: existingTags,
     authors,
     loading,
     error,
   } = useSelector((state) => state.blog);
-
-  useEffect(() => {
-    dispatch(fetchCategories());
-    dispatch(fetchTags());
-    dispatch(fetchAuthors());
-  }, [dispatch]);
 
   const editor = useEditor({
     extensions: [
@@ -266,6 +267,49 @@ export default function NewArticlePage() {
     ],
     content: "",
   });
+
+  // Fetch article data and initialize form for editing
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchSingleArticle(id));
+    }
+    dispatch(fetchCategories());
+    dispatch(fetchTags());
+    dispatch(fetchAuthors());
+  }, [dispatch, id]);
+
+  // Populate form with article data for editing
+  useEffect(() => {
+    if (id && singleArticle && editor) {
+      setName(singleArticle.name || "");
+      setDate(
+        singleArticle.date
+          ? new Date(singleArticle.date).toISOString().split("T")[0]
+          : ""
+      );
+      setCategory(singleArticle.category || "");
+      setTags(
+        singleArticle.tags && singleArticle.tags.length > 0
+          ? singleArticle.tags
+          : [""]
+      );
+      setImagePreview(singleArticle.image || null);
+      setExcerpt(singleArticle.excerpt || "");
+      editor.commands.setContent(singleArticle.content || "");
+
+      const existingAuthor = authors.find(
+        (a) => a.name === singleArticle.writer?.name
+      );
+      if (existingAuthor) {
+        setAuthor(singleArticle.writer.name);
+      } else {
+        setAuthor("new");
+        setNewAuthorName(singleArticle.writer?.name || "");
+        setNewAuthorImage(singleArticle.writer?.image || "");
+        setNewAuthorBio(singleArticle.writer?.about || "");
+      }
+    }
+  }, [singleArticle, authors, editor, id]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -308,11 +352,33 @@ export default function NewArticlePage() {
     }
   };
 
+  // Handle tag input changes
+  const handleTagChange = (index, value) => {
+    const newTags = [...tags];
+    newTags[index] = value;
+    setTags(newTags);
+  };
+
+  // Add a new tag input field
+  const addTag = () => {
+    setTags([...tags, ""]);
+  };
+
+  // Remove a tag input field
+  const removeTag = (index) => {
+    if (tags.length > 1) {
+      const newTags = tags.filter((_, i) => i !== index);
+      setTags(newTags);
+    } else {
+      setTags([""]); // Keep at least one empty input
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!imageFile || imageFile.size === 0) {
-      setImageError("Please select an image file.");
+    if (!imageFile && !imagePreview) {
+      setImageError("Please select an image file or keep the existing image.");
       return;
     }
 
@@ -346,20 +412,25 @@ export default function NewArticlePage() {
     formData.append("readingTime", estimateReadingTime(content));
     formData.append("content", content);
     formData.append("writer", JSON.stringify(writer));
-    const tagArray = tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag);
+    const tagArray = tags.map((tag) => tag.trim()).filter((tag) => tag);
     formData.append("tags", JSON.stringify(tagArray));
     formData.append("category", newCategory || category || "General");
-    formData.append("image", imageFile);
+    if (imageFile) {
+      formData.append("image", imageFile);
+    } else if (imagePreview) {
+      formData.append("image", imagePreview); // Keep existing image URL
+    }
     formData.append("excerpt", generatedExcerpt);
 
     try {
-      await dispatch(createArticle(formData)).unwrap();
+      if (id) {
+        await dispatch(updateArticle({ id, formData })).unwrap();
+      } else {
+        await dispatch(createArticle(formData)).unwrap();
+      }
       router.push("/dashboard/articles");
     } catch (err) {
-      console.error("Failed to create article:", err);
+      console.error("Failed to save article:", err);
       alert("Something went wrong.");
     }
   };
@@ -368,9 +439,13 @@ export default function NewArticlePage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">New Article</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {id ? "Edit Article" : "New Article"}
+          </h2>
           <p className="text-muted-foreground">
-            Create a new blog article for your website.
+            {id
+              ? "Update an existing blog article for your website."
+              : "Create a new blog article for your website."}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -392,215 +467,249 @@ export default function NewArticlePage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Title</Label>
-                <Input
-                  id="name"
-                  placeholder="Enter article title"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="date">Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {id && loading && !singleArticle ? (
+        <div className="flex justify-center items-center py-12">
+          <p className="text-lg text-muted-foreground">Loading article...</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select or add a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="new">Add new category...</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {category === "new" && (
-                    <Input
-                      placeholder="Enter new category"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      className="mt-2"
-                    />
-                  )}
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="author">Author</Label>
-                  <Select value={author} onValueChange={setAuthor}>
-                    <SelectTrigger id="author">
-                      <SelectValue placeholder="Select or add an author" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {authors.map((auth) => (
-                        <SelectItem key={generateHash(auth)} value={auth.name}>
-                          {auth.name}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="new">Add new author...</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {author === "new" && (
-                    <div className="space-y-2 mt-2">
-                      <Input
-                        placeholder="Author name"
-                        value={newAuthorName}
-                        onChange={(e) => setNewAuthorName(e.target.value)}
-                        required
-                      />
-                      <Input
-                        placeholder="Author image URL"
-                        value={newAuthorImage}
-                        onChange={handleAuthorImageUrlChange}
-                        required
-                      />
-                      {authorImageError && (
-                        <p className="text-sm text-red-600">
-                          {authorImageError}
-                        </p>
-                      )}
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAuthorImageChange}
-                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
-                      />
-                      <Textarea
-                        placeholder="Author bio"
-                        value={newAuthorBio}
-                        onChange={(e) => setNewAuthorBio(e.target.value)}
-                        className="h-24"
-                        required
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="image">Featured Image</Label>
-                <div className="flex items-center gap-4">
-                  <div className="h-32 w-32 rounded-md border border-dashed border-border flex items-center justify-center bg-muted">
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Featured image preview"
-                        className="h-full w-full object-cover rounded-md"
-                      />
-                    ) : (
-                      <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                    )}
-                  </div>
+                  <Label htmlFor="name">Title</Label>
                   <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                    id="name"
+                    placeholder="Enter article title"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
-                {imageError && (
-                  <p className="text-sm text-red-600">{imageError}</p>
-                )}
-              </div>
 
-              <div className="grid gap-2">
-                <Label>Content</Label>
-                <Tabs defaultValue="write">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="write">Write</TabsTrigger>
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="write" className="mt-2">
-                    <div className="border rounded-md">
-                      <Toolbar editor={editor} />
-                      <EditorContent
-                        editor={editor}
-                        className="prose dark:prose-invert max-w-none p-4 min-h-[300px] bg-white dark:bg-gray-800 text-black dark:text-white border-t-0"
-                        placeholder="Write your article content here..."
+                <div className="grid gap-2">
+                  <Label htmlFor="date">Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select or add a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new">Add new category...</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {category === "new" && (
+                      <Input
+                        placeholder="Enter new category"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                        className="mt-2"
                       />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="preview" className="mt-2">
-                    <div className="rounded-md border p-4 min-h-[300px]">
-                      {editor && editor.getHTML() !== "<p></p>" ? (
-                        <div className="prose dark:prose-invert max-w-none">
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: editor.getHTML(),
-                            }}
-                          />
-                        </div>
+                    )}
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="author">Author</Label>
+                    <Select value={author} onValueChange={setAuthor}>
+                      <SelectTrigger id="author">
+                        <SelectValue placeholder="Select or add an author" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {authors.map((auth) => (
+                          <SelectItem
+                            key={generateHash(auth)}
+                            value={auth.name}
+                          >
+                            {auth.name}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new">Add new author...</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {author === "new" && (
+                      <div className="space-y-2 mt-2">
+                        <Input
+                          placeholder="Author name"
+                          value={newAuthorName}
+                          onChange={(e) => setNewAuthorName(e.target.value)}
+                          required
+                        />
+                        <Input
+                          placeholder="Author image URL"
+                          value={newAuthorImage}
+                          onChange={handleAuthorImageUrlChange}
+                          required
+                        />
+                        {authorImageError && (
+                          <p className="text-sm text-red-600">
+                            {authorImageError}
+                          </p>
+                        )}
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAuthorImageChange}
+                          className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                        />
+                        <Textarea
+                          placeholder="Author bio"
+                          value={newAuthorBio}
+                          onChange={(e) => setNewAuthorBio(e.target.value)}
+                          className="h-24"
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="image">Featured Image</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="h-32 w-32 rounded-md border border-dashed border-border flex items-center justify-center bg-muted">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Featured image preview"
+                          className="h-full w-full object-cover rounded-md"
+                        />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-muted-foreground">
-                          Write some content to see a preview
-                        </div>
+                        <ImageIcon className="h-8 w-8 text-muted-foreground" />
                       )}
                     </div>
-                  </TabsContent>
-                </Tabs>
-              </div>
+                    <Input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#7ED967] file:text-black hover:file:bg-[#7ED967]/90"
+                      required={!imagePreview}
+                    />
+                  </div>
+                  {imageError && (
+                    <p className="text-sm text-red-600">{imageError}</p>
+                  )}
+                </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="excerpt">Excerpt</Label>
-                <Textarea
-                  id="excerpt"
-                  placeholder="Write a short excerpt for your article"
-                  className="h-24"
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground">
-                  This will be displayed on the blog listing page. If left
-                  empty, it will be generated from the content.
-                </p>
-              </div>
+                <div className="grid gap-2">
+                  <Label>Content</Label>
+                  <Tabs defaultValue="write">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="write">Write</TabsTrigger>
+                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="write" className="mt-2">
+                      <div className="border rounded-md">
+                        <Toolbar editor={editor} />
+                        <EditorContent
+                          editor={editor}
+                          className="prose dark:prose-invert max-w-none p-4 min-h-[300px] bg-white dark:bg-gray-800 text-black dark:text-white border-t-0"
+                          placeholder="Write your article content here..."
+                        />
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="preview" className="mt-2">
+                      <div className="rounded-md border p-4 min-h-[300px]">
+                        {editor && editor.getHTML() !== "<p></p>" ? (
+                          <div className="prose dark:prose-invert max-w-none">
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: editor.getHTML(),
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-muted-foreground">
+                            Write some content to see a preview
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="tags">Tags</Label>
-                <Input
-                  id="tags"
-                  placeholder="Enter tags separated by commas"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Tags help users find related content.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <div className="grid gap-2">
+                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Textarea
+                    id="excerpt"
+                    placeholder="Write a short excerpt for your article"
+                    className="h-24"
+                    value={excerpt}
+                    onChange={(e) => setExcerpt(e.target.value)}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    This will be displayed on the blog listing page. If left
+                    empty, it will be generated from the content.
+                  </p>
+                </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" asChild disabled={loading}>
-            <Link href="/dashboard/articles">Cancel</Link>
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Article"}
-          </Button>
-        </div>
-      </form>
+                <div className="grid gap-2">
+                  <Label>Tags</Label>
+                  <div className="space-y-2">
+                    {tags.map((tag, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          placeholder="Enter a tag"
+                          value={tag}
+                          onChange={(e) =>
+                            handleTagChange(index, e.target.value)
+                          }
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeTag(index)}
+                          disabled={tags.length === 1 && tag === ""}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addTag}
+                      className="mt-2"
+                    >
+                      <Plus className="mr-2 h-4 w-4" /> Add Tag
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Tags help users find related content.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" asChild disabled={loading}>
+              <Link href="/dashboard/articles">Cancel</Link>
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save Article"}
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

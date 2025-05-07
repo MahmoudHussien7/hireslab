@@ -216,7 +216,7 @@ export default function BlogPostPage({ params: paramsPromise }) {
                   src={blogPost.image}
                   alt={blogPost.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
 
