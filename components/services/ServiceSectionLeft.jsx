@@ -8,7 +8,7 @@ export default function ServiceSectionLeft({ component }) {
     <section className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-20 flex flex-col md:flex-row items-center gap-10 py-16">
       {/* Image Section */}
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
+        initial={{ opacity: 0, x: 10 }}
         whileInView={{ opacity: 1, x: 0 }}
         whileHover={{ scale: 1.0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -16,13 +16,13 @@ export default function ServiceSectionLeft({ component }) {
         className="flex-1 overflow-hidden flex justify-center md:justify-start items-center w-full"
       >
         <div
-          className={`${styles.clip_img} bg-cover bg-center bg-no-repeat w-full max-w-[400px] sm:max-w-[500px] aspect-[5/6] rounded-lg`}
+          className={`${styles.clip_img} sm:clip-img clip-img bg-cover bg-center bg-no-repeat w-[400px] h-[500px] rounded-lg`}
         />
       </motion.div>
 
       {/* Text Section */}
       <motion.div
-        initial={{ opacity: 0, x: -50 }}
+        initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         viewport={{ once: true }}
