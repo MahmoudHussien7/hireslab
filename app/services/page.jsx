@@ -12,7 +12,7 @@ const Services = () => {
       <ServicesHero />
       <ServicesBenefits />
       <ServiceCard />
-      <CarouselBrand />
+      <CarouselBrand className="bg-white" />
       {/* <Service /> */}
       <Newsletter />
     </>

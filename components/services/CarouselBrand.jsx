@@ -3,7 +3,7 @@ import React from "react";
 import Slider from "react-slick";
 import Image from "next/image";
 
-export default function CarouselBrand() {
+export default function CarouselBrand({ className }) {
   const items = [
     { img: "/images/Adaptavate.svg" },
     { img: "/images/Cartesian.svg" },
@@ -48,7 +48,9 @@ export default function CarouselBrand() {
   };
 
   return (
-    <div className="w-full overflow-hidden px-4 md:px-10 sm:px-12 lg:px-16 xl:px-20 bg-white dark:bg-gray-900">
+    <div
+      className={`w-full overflow-hidden px-4 md:px-10 sm:px-12 lg:px-16 xl:px-20 dark:bg-gray-900 ${className}`}
+    >
       <Slider {...settings} className="w-full  mx-auto ">
         {items.map((item, index) => (
           <div key={index} className="flex justify-center items-center px-2">

@@ -1,12 +1,28 @@
+"use client";
+import { useState } from "react";
 import Card from "./Card";
 import CarouselBrand from "./CarouselBrand";
+import Modal from "./ServiceModal";
 
-export default async function Section() {
+export default function Section() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedCard(null);
+  };
+
   const data = [
     {
       section_number: 1,
-      title: " 1.1 PRBO",
-      description: "Learn more",
+      title: "1.1 PRBO",
+      description: "Description of PRBO services",
       cards: [
         {
           image: "/images/heroServices.jpg",
@@ -68,11 +84,20 @@ export default async function Section() {
     <div className="space-y-10">
       {data.map((sectionData, index) => (
         <div key={index}>
-          {/* Render the section */}
-          <section className="py-8 px-4 rounded-lg shadow-sm">
+          {/* Render the section with an ID */}
+          <section
+            id={`section-${sectionData.section_number}`}
+            className="py-8 px-4 rounded-lg shadow-sm"
+          >
             <h2 className="text-4xl font-bold text-center text-prime mb-6">
-              {` ${sectionData.title}`}
+              {sectionData.title}
             </h2>
+            <p
+              href="/"
+              className="cursor-pointer text-center text-white mb-6 text-2xl italic"
+            >
+              Learn More
+            </p>
             <p className="text-center text-white mb-6">
               {sectionData.description}
             </p>
@@ -83,6 +108,7 @@ export default async function Section() {
                   image={card.image}
                   quote={card.quote}
                   nameTitle={card.nameTitle}
+                  onClick={() => handleCardClick(card)}
                 />
               ))}
             </div>
@@ -95,6 +121,12 @@ export default async function Section() {
           )}
         </div>
       ))}
+      {/* Render Modal */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        card={selectedCard}
+      />
     </div>
   );
 }
