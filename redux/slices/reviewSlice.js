@@ -1,11 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const token = Cookies.get("token");
 
 export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/reviews");
+      const response = await axios.get(
+        "https://hires-lab.glitch.me/api/review"
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -19,7 +24,16 @@ export const createReview = createAsyncThunk(
   "reviews/createReview",
   async (reviewData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/reviews", reviewData);
+      const token = Cookies.get("token");
+      const response = await axios.post(
+        "https://hires-lab.glitch.me/api/review",
+        reviewData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -33,7 +47,17 @@ export const updateReview = createAsyncThunk(
   "reviews/updateReview",
   async ({ id, reviewData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/reviews/${id}`, reviewData);
+      const token = Cookies.get("token");
+
+      const response = await axios.put(
+        `https://hires-lab.glitch.me/api/review/${id}`,
+        reviewData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -47,9 +71,15 @@ export const deleteReview = createAsyncThunk(
   "reviews/deleteReview",
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`/api/reviews/${id}`);
+      const token = Cookies.get("token");
+      await axios.delete(`https://hires-lab.glitch.me/api/review/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return id;
     } catch (error) {
+      console.error(error); // فقط أثناء التطوير
       return rejectWithValue(
         error.response?.data?.message || "Failed to delete review"
       );

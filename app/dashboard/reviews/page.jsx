@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   Plus,
   Search,
-  Filter,
   MoreHorizontal,
   Eye,
   Edit,
@@ -58,12 +57,7 @@ export default function ReviewsPage() {
   const itemsPerPage = 10;
 
   const dispatch = useDispatch();
-  const {
-    reviews,
-    status,
-    error: reduxError,
-  } = useSelector((state) => state.reviews);
-
+  const { reviews, status } = useSelector((state) => state.reviews);
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -86,15 +80,13 @@ export default function ReviewsPage() {
       return (
         searchTerm === "" ||
         review.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.content?.toLowerCase().includes(searchTerm.toLowerCase())
+        review.review?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     })
     .map((review) => ({
       id: review._id,
-      title: review.title || "Untitled Review",
-      content: stripHtmlAndTruncate(review.content || "", 100),
-      rating: review.rating || 0,
-      author: review.author?.name || "Anonymous",
+      title: review.name || "Untitled Review",
+      review: stripHtmlAndTruncate(review.review || "", 100),
       date: review.createdAt,
       slug: generateSlug(review.title || "review-" + review._id),
     }));
@@ -198,8 +190,7 @@ export default function ReviewsPage() {
                 <thead>
                   <tr className="border-b text-left">
                     <th className="pb-3 font-medium">Title</th>
-                    <th className="pb-3 font-medium">Author</th>
-                    <th className="pb-3 font-medium">Rating</th>
+                    <th className="pb-3 font-medium">Review</th>
                     <th className="pb-3 font-medium">Date</th>
                     <th className="pb-3 font-medium text-right">Actions</th>
                   </tr>
@@ -208,8 +199,7 @@ export default function ReviewsPage() {
                   {paginatedReviews.map((review) => (
                     <tr key={review.id} className="border-b">
                       <td className="py-3">{review.title}</td>
-                      <td className="py-3">{review.author}</td>
-                      <td className="py-3">{review.rating}/5</td>
+                      <td className="py-3">{review.review}</td>
                       <td className="py-3 text-muted-foreground">
                         {new Date(review.date).toLocaleDateString()}
                       </td>

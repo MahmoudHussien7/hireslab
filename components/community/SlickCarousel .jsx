@@ -1,54 +1,25 @@
-"use client"
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Slider from "react-slick";
 import { Quote } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchReviews } from "@/redux/slices/reviewSlice"; // Adjust path to your slice
 
+// Import slick-carousel CSS
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function AutoPlay() {
-  const steps = [
-    {
-      name: "Apply to Join",
-      review:
-        "Fill out a short application form to tell us about yourself and your interests.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Get Approved",
-      review:
-        "Our team will review your application and get in touch with you shortly.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Join the Platform",
-      review:
-        "Once approved, you’ll receive access to our members-only platform.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Start Engaging",
-      review:
-        "Participate in events, discussions, and content co-creation with the community.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Get Approved",
-      review:
-        "Our team will review your application and get in touch with you shortly.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Join the Platform",
-      review:
-        "Once approved, you’ll receive access to our members-only platform.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-    {
-      name: "Start Engaging",
-      review:
-        "Participate in events, discussions, and content co-creation with the community.",
-      icon: <Quote className="w-5 h-5 text-indigo-600 mb-2" />,
-    },
-  ];
+  const dispatch = useDispatch();
+  const { reviews, status, error } = useSelector((state) => state.reviews);
+
+  useEffect(() => {
+    // Fetch reviews if not already loaded
+    if (status === "idle") {
+      dispatch(fetchReviews());
+    }
+  }, [dispatch, status]);
 
   const settings = {
     dots: true,
@@ -67,40 +38,54 @@ function AutoPlay() {
         },
       },
       {
-        breakpoint: 1024, 
+        breakpoint: 1024,
         settings: {
           slidesToShow: 2,
         },
       },
       {
-        breakpoint: 768, 
+        breakpoint: 768,
         settings: {
           slidesToShow: 1,
         },
       },
       {
-        breakpoint: 480, 
+        breakpoint: 480,
         settings: {
           slidesToShow: 1,
         },
       },
     ],
-    
   };
+
+  if (status === "loading") {
+    return <p className="text-center">Loading reviews...</p>;
+  }
+
+  if (status === "failed") {
+    return (
+      <p className="text-center text-red-500">
+        {error || "Failed to load reviews"}
+      </p>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return <p className="text-center">No reviews available</p>;
+  }
 
   return (
     <div className="px-5 py-10">
       <Slider {...settings}>
-        {steps.map((step, index) => (
+        {reviews.map((review) => (
           <div
-            key={index}
-            className="flex flex-col items-center justify-center bg-white p-10 rounded-lg shadow w-full
-             max-w-sm md:min-w-sm mx-auto h-full"
+            key={review._id}
+            className="flex flex-col items-center justify-center bg-white p-10 rounded-lg shadow w-full max-w-sm mx-auto h-full"
           >
-            {step.icon}
-            <p className="text-gray-600 text-center text-md">{step.review}</p>
+            <Quote className="w-5 h-5 text-indigo-600 mb-2" />
+            <p className="text-gray-600 text-center text-md">{review.review}</p>
             <h3 className="text-sm font-medium py-2 text-center text-black">
-              {step.name}
+              {review.name}
             </h3>
           </div>
         ))}
