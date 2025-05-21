@@ -6,11 +6,40 @@ import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { subscribe,resetSubscribeState } from "@/redux/slices/subscribe";
+
 export default function Footer() {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
   const is404Page = pathname === "/not-found";
+  const [email, setEmail] = useState("");
+  const dispatch = useDispatch();
+  const { loading, success, error } = useSelector((state) => state.subscribe);
 
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new Error ("Please enter a valid email address.");
+    return;
+  }
+
+dispatch(subscribe(email)).then((res) => {
+  // console.log("response:", JSON.stringify(res)); 
+
+  if (res.meta?.requestStatus === "fulfilled") {
+    // console.log("testttttttttttttttttttttt"); 
+    setEmail("");
+    setTimeout(() => dispatch(resetSubscribeState()), 3000);
+  } else {
+    console.log("Subscription failed:", res?.payload || res?.error?.message);
+  }
+});
+
+};
   if (isDashboard || is404Page) return null; // 👈 Skip rendering if in dashboard or 404 page
   return (
     <footer className=" md:px-0 sm:px-0 lg:px-16 bg-black text-white bg-gradient-to-bl from-black  to-[#0d1b10]">
@@ -116,16 +145,29 @@ export default function Footer() {
             <p className="text-gray-400 mb-6">
               Subscribe to our newsletter for the latest updates
             </p>
-            <div className="flex flex-col space-y-4">
+            <form onSubmit={handleSubmit}
+             className="flex flex-col space-y-4">
               <Input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
                 className="bg-gray-800 border-gray-700 text-white"
               />
-              <Button type="submit" variant="prime">
-                Subscribe
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              variant="prime"
+              className="w-full sm:w-auto"
+              disabled={loading}
+            >
+              {loading ? "Subscribing..." : "Subscribe"}
+            </Button>
+          </form>
+
+          <div className="text-center mt-4">
+            {success && <p className="text-green-600">Subscribed successfully!</p>}
+            {error && <p className="text-red-600">Error: {error}</p>}
+          </div>
           </div>
         </div>
 
