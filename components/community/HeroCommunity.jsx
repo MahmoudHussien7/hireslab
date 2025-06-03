@@ -11,13 +11,13 @@ export default function HeroCommunity() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
             >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
                     <span className="hires-gradient-text">The HiresLab</span><br />
                     Where Creators Belong
                 </h1>
                 <p className="text-[0.9rem] md:text-xl max-w-2xl text-white">
-                    Join a vibrant collective of thinkers, doers, and dreamers,
-                    this is more than a community—it's a launchpad for innovation, collaboration, and growth.
+                  At The Hires Lab, our community isn’t just a team—it’s a dynamic space where collaboration meets inspiration. 
+                  Whether you’re a seasoned recruiter, a curious intern, or a fresh face exploring the world of HR, this is your home base.
                 </p>
             </motion.div>
         </section>
