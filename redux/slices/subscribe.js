@@ -4,7 +4,7 @@ export const subscribe = createAsyncThunk(
   "subscribe/postNewsletter",
   async (email, { rejectWithValue }) => {
     try {
-      const response = await fetch("https://hires-lab.glitch.me/api/subscribe", {
+      const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,7 +6,7 @@ export const submitContact = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "https://hires-lab.glitch.me/api/contacts/",
+        "/api/contacts/",
         {
           method: "POST",
           body: formData, // Send FormData directly

@@ -3,7 +3,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const BASE_URL = 'https://hires-lab.glitch.me/api/auth/reset-password';
+const BASE_URL = '/api/auth/reset-password';
 
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword', 

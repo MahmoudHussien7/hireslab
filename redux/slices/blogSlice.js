@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
-const BASE_URL = "https://hires-lab.glitch.me/api/articles";
+const BASE_URL = "/api/articles";
 
 // Fetch all articles
 export const fetchArticles = createAsyncThunk(

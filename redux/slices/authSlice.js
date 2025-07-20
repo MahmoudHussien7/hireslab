@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import {jwt_decode} from "jwt-decode";
 
-const BASE_URL = "https://hires-lab.glitch.me/api/auth/login";
+const BASE_URL = "/api/auth/login";
 
 // signIn thunk
 export const signIn = createAsyncThunk(

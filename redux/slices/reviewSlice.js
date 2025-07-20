@@ -9,7 +9,7 @@ export const fetchReviews = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        "https://hires-lab.glitch.me/api/review"
+        "/api/review"
       );
       return response.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const createReview = createAsyncThunk(
     try {
       const token = Cookies.get("token");
       const response = await axios.post(
-        "https://hires-lab.glitch.me/api/review",
+        "/api/review",
         reviewData,
         {
           headers: {
@@ -50,7 +50,7 @@ export const updateReview = createAsyncThunk(
       const token = Cookies.get("token");
 
       const response = await axios.put(
-        `https://hires-lab.glitch.me/api/review/${id}`,
+        `/api/review/${id}`,
         reviewData,
         {
           headers: {
@@ -72,7 +72,7 @@ export const deleteReview = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const token = Cookies.get("token");
-      await axios.delete(`https://hires-lab.glitch.me/api/review/${id}`, {
+      await axios.delete(`/api/review/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
