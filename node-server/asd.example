@@ -1,0 +1,19 @@
+MONGO_URI=mongodb+srv://Cluster44370:rPxVwmau0taAOsUJ@cluster44370.a6jdq.mongodb.net/?authMechanism=SCRAM-SHA-1
+# JWT
+JWT_SECRET=xqp2XUOuw3E1zvK7tOX68eq3C3fBgrhElpPI9GLcgG88h5zYXsLsBpMQYoI62uOhqOaU9FsxvCg5kSxSsw8WAw11
+
+# Email
+EMAIL_USER=mahmoudmelsaid1@gmail.com
+EMAIL_PASS=weiy uoqh zpln zeld
+
+# Firebase
+FIREBASE_PROJECT_ID=canteen-e3751
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-ba15h@canteen-e3751.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANB...snip...\n-----END PRIVATE KEY-----"
+FIREBASE_PRIVATE_KEY_ID=9b0addc958f46948ac8a8668613c3e561f538135
+
+# Firebase Storage
+FIREBASE_STORAGE_BUCKET=gs://canteen-e3751.appspot.com
+
+# Node
+NODE_ENV=production

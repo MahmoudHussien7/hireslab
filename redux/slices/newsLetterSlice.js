@@ -6,7 +6,7 @@ export const subscribeToNewsletter = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "https://hires-lab.glitch.me/api/subscribe",
+        "/api/subscribe",
         { email },
         {
           headers: {
