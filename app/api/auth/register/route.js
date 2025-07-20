@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import connectDB from "../../../config/mongodb"
-import User from "../../../models/user"
+import connectDB from "@/node-server/config/mongodb"
+import User from "@/node-server/models/user"
 import jwt from "jsonwebtoken"
 
 const generateToken = (user) => {

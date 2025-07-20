@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
-import connectDB from "../../../config/mongodb"
-import Review from "../../../models/reviews"
-import { verifyToken } from "../../../middleware/auth"
+import connectDB from "@/node-server/config/mongodb"
+import Review from "@/node-server/models/reviews"
+import { verifyToken } from "@/node-server/middleware/auth"
 
 export async function GET(request, { params }) {
       await connectDB();
