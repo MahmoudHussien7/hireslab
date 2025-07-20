@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
-import connectDB from "../../../config/mongodb"
-import User from "../../../models/user"
-import { verifyToken } from "../../../middleware/auth"
+import User from "@/node-server/models/user"
+import { verifyToken } from "@/node-server/middleware/auth"
+import connectDB from "@/node-server/config/mongodb"
 
 export async function POST(request) {
   await connectDB()
