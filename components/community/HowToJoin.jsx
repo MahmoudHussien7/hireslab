@@ -6,23 +6,23 @@ import { motion } from 'framer-motion';
 export default function HowToJoin() {
   const steps = [
     {
-      title: 'Apply to Join',
-      description: 'Fill out a short application form to tell us about yourself and your interests.',
+      title: 'Apply',
+      description: 'Fill out a quick form and tell us about you and your interests.',
       image: '/images/1.webp',
     },
     {
       title: 'Get Approved',
-      description: 'Our team will review your application and get in touch with you shortly.',
+      description: 'Our team will review your application and reach out.',
       image: '/images/1.webp',
     },
     {
-      title: 'Join the Platform',
-      description: 'Once approved, you’ll receive access to our members-only platform.',
+      title: 'Join the Community',
+      description: 'Once accepted, you’ll gain access to our members-only community.',
       image: '/images/1.webp',
     },
     {
       title: 'Start Engaging',
-      description: 'Participate in events, discussions, and content co-creation with the community.',
+      description: 'Take part in events, discussions, content creation, and community projects.',
       image: '/images/1.webp',
     },
   ];

@@ -8,19 +8,19 @@ export default function BenefitsCommunity() {
   const benefits = [
     {
       title: "Real Growth Opportunities",
-      description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet ullam ratione rem laborum molestias est.`,
+      description: ` Access curated workshops, mentorship, and exclusive resources that grow your career.`,
     },
     {
       title: "Strong Network",
-      description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet ullam ratione rem laborum molestias est.`,
+      description: ` Connect with recruiters, HR leaders, creatives, and industry professionals.`,
     },
     {
       title: "Talent Support",
-      description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet ullam ratione rem laborum molestias est.`,
+      description: ` Need guidance? We’re here to support your journey with advice and opportunities.`,
     },
     {
       title: "Collaborative Projects",
-      description: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet ullam ratione rem laborum molestias est.`,
+      description: ` Join campaigns, events, and projects where your ideas and voice matter.`,
     },
   ];
 
@@ -37,7 +37,7 @@ export default function BenefitsCommunity() {
         {/* Text Section */}
         <div className="flex-1 w-full flex flex-col justify-center items-start md:items-start text-left space-y-6">
           <h2 className="hires-gradient-text text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 text-left sm:text-center md:text-left">
-            What Are the Benefits?
+           Why Join?
           </h2>
 
           {benefits.map((item, index) => (

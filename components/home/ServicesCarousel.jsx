@@ -8,48 +8,63 @@ import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 const services = [
   {
     id: 1,
-    title: "Stage 1: Building the funnel",
+    title: "The Brief",
     description:
-      "You found your first few hires through personal and professional networks, but now you're running out of options. You're staring at a blank page wondering how to even begin setting up a proper recruiting funnel.",
+      "We get to know your goals, culture, and what a great hire looks like — even if you're not sure yet.",
     images: [
       "https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp",
       "https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp",
       "https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.webp",
     ],
     features: [
-      "ATS selection, setup, and integration",
-      "Hiring material design",
-      "Standard operating procedure design",
+      "We listen to your goals, culture, and team dynamics",
+      "Help define the role and ideal candidate profile",
+      "Align on success metrics from day one",
     ],
   },
   {
     id: 2,
-    title: "Stage 2: Scaling your recruitment",
+    title: "Sourcing",
     description:
-      "Your company is growing rapidly and you need to hire multiple roles across different departments. You need a structured approach to scale your recruitment efforts efficiently.",
+      "We tap into our local and global networks to find the right people and build you a future-ready talent pool.",
     images: [
       "https://img.daisyui.com/images/stock/photo-1494253109108-2e30c049369b.webp",
       "https://img.daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.webp",
     ],
     features: [
-      "Recruitment strategy development",
-      "Candidate sourcing and screening",
-      "Interview process optimization",
+      "Tap into local and global networks",
+      "Use smart tools to filter by relevance",
+      "Build a tailored database for now & later",
     ],
   },
   {
     id: 3,
-    title: "Stage 3: Talent retention",
+    title: "Screening",
     description:
-      "You've built a great team, but now you need to focus on keeping your top talent engaged and motivated to ensure long-term success and reduce turnover.",
+      "We assess skills, experience, and culture fit — then send only the most aligned candidates your way.",
     images: [
       "https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.webp",
       "https://img.daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.webp",
     ],
     features: [
-      "Employee engagement programs",
-      "Performance management systems",
-      "Career development frameworks",
+      "Human-led resume & value screening",
+      "Interviews and skill assessments",
+      "Cultural fit check before presenting",
+    ],
+  },
+  {
+    id: 4,
+    title: "Onboarding",
+    description:
+      "You choose. We guide. From offer to first day, we ensure a smooth and supported hire.",
+    images: [
+      "https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.webp",
+      "https://img.daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.webp",
+    ],
+    features: [
+      "Share candidate insights for easier decisions",
+      "Guide offer communication and negotiations",
+      "Assist with onboarding to ensure smooth transitions",
     ],
   },
 ];
@@ -96,8 +111,7 @@ export default function ServicesCarousel() {
             THE RECRUITING JOURNEY
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
-            We help you grow as you embark on your recruiting journey.
-          </h2>
+Here’s How We Make Hiring Work — For Everyone.          </h2>
         </div>
 
         <div className="relative max-w-5xl mx-auto">

@@ -11,8 +11,8 @@ export default function VideoSection() {
       <div className="container mx-auto px-4">
         <SectionHeading
           className="text-white"
-          title="See How We Work"
-          subtitle="Watch our short video to learn more about our recruitment process and how we can help your business grow."
+          title="This is what The Hires Lab is All About"
+          subtitle="Watch how we take the stress out of recruitment and turn it into a smooth, human-first experience — for both companies and candidates."
           center
         />
         <div className="relative aspect-video max-w-4xl mx-auto rounded-lg overflow-hidden shadow-xl">

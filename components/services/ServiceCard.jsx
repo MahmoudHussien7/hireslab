@@ -21,23 +21,23 @@ export default function Section() {
   const data = [
     {
       section_number: 1,
-      title: "1.1 PRBO",
-      description: "Description of PRBO services",
+      title: "1.RPO Recruitment Process Outsourcing",
+      description: "Talent delivered. Business moves forward",
       cards: [
         {
           image: "/images/heroServices.jpg",
-          quote: "Revealing the true science and urban legends.",
-          nameTitle: "Skeptoid",
+          quote: "Build your workforce fast, with no compromise on quality.",
+          nameTitle: "Mass Hiring",
         },
         {
           image: "/images/heroServices.jpg",
-          quote: "This product changed my life!",
-          nameTitle: "Jane Doe, CEO",
+          quote: "Find visionary leaders who align with your mission.",
+          nameTitle: "Executive Hiring",
         },
         {
           image: "/images/heroServices.jpg",
-          quote: "This product changed my life!",
-          nameTitle: "Jane Doe, CEO",
+          quote: "Expand across borders with vetted, remote-ready profession",
+          nameTitle: "Global Talent Solutions",
         },
       ],
       cta_text: "Learn More",
@@ -45,14 +45,24 @@ export default function Section() {
     },
     {
       section_number: 2,
-      title: "1.2 Explore Categories",
+      title: "2.BPO- Business Process Outsourcing",
       description:
-        "Start with the main category as a title + learn more CTA to direct them to it's explanation article to 'learn more' + Cards displaying subcategories 'Picture - Title - H2 description' In the middle Clients breaker - Then proceed with the rest of the sections - idea services as a quick promotion & social proof while viewing the services to enforce the decision making process.",
+        "Your operational teams, built for performance.",
       cards: [
         {
           image: "/images/heroServices.jpg",
-          quote: "Great service!",
-          nameTitle: "Client 1",
+          quote: "Sales, customer service, and field support",
+          nameTitle: "Skilled, Ready-to-Go Teams",
+        },
+        {
+          image: "/images/heroServices.jpg",
+          quote: "Matched to your business goals and market needs",
+          nameTitle: "Industry-Focused Talent",
+        },
+        {
+          image: "/images/heroServices.jpg",
+          quote: "Flexible team sizes that grow with you",
+          nameTitle: "Scalable Support",
         },
       ],
       cta_text: "Explore Now",
@@ -60,19 +70,24 @@ export default function Section() {
     },
     {
       section_number: 3,
-      title: "1.3 Highlight Results and Build Trust",
+      title: "3.HR Consultation ",
       description:
-        "Highlight the impact with testimonials + a strong CTA to seal the deal",
+        "We guide businesses through people challenges — from HR audits to culture building and policy development.",
       cards: [
         {
           image: "/images/heroServices.jpg",
-          quote: "This product changed my life!",
-          nameTitle: "Jane Doe, CEO",
+          quote: "",
+          nameTitle: "Company structuring & team planning",
         },
         {
           image: "/images/heroServices.jpg",
-          quote: "Amazing results in just a week!",
-          nameTitle: "John Smith, Entrepreneur",
+          quote: "",
+          nameTitle: "Culture & value alignment",
+        },
+        {
+          image: "/images/heroServices.jpg",
+          quote: "",
+          nameTitle: "Performance systems, KPIs & policy rollout",
         },
       ],
       cta_text: "Get Started",
