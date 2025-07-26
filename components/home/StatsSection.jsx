@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Clock, Users, Award, Star } from "lucide-react";
+import { Clock, Users, Award, Star, Globe, Handshake } from "lucide-react";
 import AnimatedText from "@/components/ui/AnimatedText";
 
 function useInViewCounter(start, end, delay = 0) {
@@ -46,28 +46,28 @@ function useInViewCounter(start, end, delay = 0) {
 export default function StatsSection() {
   const stats = [
     {
-      number: 94,
-      description: "% placement retention rate after 12 months",
-      icon: <Clock className="text-[#16a34a]" />,
+      number: 5000,
+      description: "+ Lives Changed | Real hires across industries",
+      icon: <Handshake className="text-[#16a34a]" />,
       iconBg: "bg-[#bbf7d0]",
     },
     {
-      number: 35,
+      number: 200,
       description:
-        "% of our candidates are engaged via our community events & initiatives",
-      icon: <Users className="text-[#f59e0b]" />,
+        "+ Clients & Counting | Startups, SMEs, and multinationals trust us to build their teams",
+      icon: <Globe className="text-[#f59e0b]" />,
       iconBg: "bg-[#fef3c7]",
     },
     {
-      number: 30,
-      description: "% of our leadership placements in 2024 identified as women",
-      icon: <Award className="text-[#16a34a]" />,
+      number: 10,
+      description: "Day Avg. Time-to-Hire That’s 40% faster than the market ",
+      icon: <Clock className="text-[#16a34a]" />,
       iconBg: "bg-[#bbf7d0]",
     },
     {
       number: 84,
       description:
-        "is our top-notch NPS score, which means the vast majority of people would happily recommend us",
+        " Certified experts who know what great hiring looks like",
       icon: <Star className="text-[#f59e0b]" />,
       iconBg: "bg-[#fef3c7]",
     },

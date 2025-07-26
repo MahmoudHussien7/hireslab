@@ -17,14 +17,9 @@ export default function OurMission() {
       </div>
       <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
       <p className="text-gray-400 text-3xl mb-4">
-        To revolutionize the recruitment industry by providing personalized,
-        efficient, and effective talent acquisition solutions that create
-        lasting value for both candidates and employers.
+       Empowering growing businesses with strategic, people-first recruitment that drives lasting impact.
       </p>
-      <p className="text-gray-400">
-        We believe in building long-term relationships based on trust,
-        transparency, and delivering exceptional results.
-      </p>
+    
     </motion.div>
   );
 }

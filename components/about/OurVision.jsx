@@ -18,14 +18,9 @@ export default function OurVision() {
       </div>
       <h2 className="text-4xl font-bold mb-4 text-white">Our Vision</h2>
       <p className="text-gray-400 text-3xl mb-4">
-        To be the most trusted and innovative recruitment partner, known for our
-        ability to connect exceptional talent with opportunities where they can
-        thrive and make a meaningful impact.
+     To transform one million lives through smart hiring, industry innovation, and human-centered expertise.
       </p>
-      <p className="text-gray-400">
-        We envision a world where every professional finds fulfilling work and
-        every organization has the talent they need to succeed.
-      </p>
+     
     </motion.div>
   );
 }

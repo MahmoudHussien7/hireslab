@@ -5,18 +5,26 @@ import Image from "next/image";
 
 export default function CarouselBrand({ className }) {
   const items = [
-    { img: "/images/Adaptavate.svg" },
-    { img: "/images/Cartesian.svg" },
-    { img: "/images/frist.svg" },
-    { img: "/images/logo1.webp" },
-    { img: "/images/logo2.webp" },
-    { img: "/images/logo3.webp" },
+    { img: "/clientslogos/1.svg" },
+    { img: "/clientslogos/2.svg" },
+    { img: "/clientslogos/3.svg" },
+    { img: "/clientslogos/4.svg" },
+    { img: "/clientslogos/5.svg" },
+    { img: "/clientslogos/6.svg" },
+    { img: "/clientslogos/7.svg" },
+    { img: "/clientslogos/8.svg" },
+    { img: "/clientslogos/9.svg" },
+    { img: "/clientslogos/10.svg" },
+    { img: "/clientslogos/11.svg" },
+    { img: "/clientslogos/12.svg" },
+    { img: "/clientslogos/13.svg" },
+    { img: "/clientslogos/14.svg" },
   ];
 
   const settings = {
     dots: true,
     infinite: true,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true,
     speed: 3000,

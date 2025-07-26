@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 export default function ServicesHero() {
   const buttons = [
-    { label: "PRBO", href: "#section-1" },
-    { label: "Explore", href: "#section-2" },
-    { label: "Results", href: "#section-3" },
+    { label: "RPO", href: "#section-1" },
+    { label: "BPO", href: "#section-2" },
+    { label: "Consultations", href: "#section-3" },
   ];
   // Handle smooth scrolling when clicking buttons
   const handleScroll = (e, href) => {
@@ -37,8 +37,7 @@ export default function ServicesHero() {
             OUR <span className="hires-gradient-text text-6xl">SERVICES</span>
           </h1>
           <p className="text-gray-300 max-w-xl mx-auto text-sm md:text-base">
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna"
+            We don’t just fill positions — we embed recruitment and HR systems that fuel business growth and change lives.
           </p>
         </motion.div>
 

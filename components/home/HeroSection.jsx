@@ -63,12 +63,10 @@ export default function HeroSection() {
           className="max-w-3xl"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-            <span className="hires-gradient-text">Transforming</span> How
-            Companies Hire Talent
+            <span className="hires-gradient-text">Impacting</span> lives through strategic HR & talent solutions
           </h1>
-          <p className="text-xl mb-8 text-gray-500">
-            We connect exceptional talent with forward-thinking companies to
-            create lasting professional relationships.
+          <p className="text-xl mb-8 text-gray-300">
+      We match people with purpose — helping ambitious companies and talented individuals build stronger futures, one hire at a time.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg" variant="prime">

@@ -15,10 +15,9 @@ export default function ServicesBenefits() {
       <section className='container mx-auto px-10 md:px-12 lg:px-20 w-full h-auto text-white flex justify-center items-center py-16'>
         <div className='bg-[#292929] md:flex p-5 rounded-lg'>
           <div className=' p-3'>
-            <h2 className='text-2xl font-medium mb-4'>Go embedded</h2>
+            <h2 className='text-2xl font-medium mb-4'>People-first solutions, built for impact.</h2>
             <p className='mb-4'>
-              Find out why our partners like Brilliant Planet,
-              Copper <br /> and Volta Trucks are all going embedded with Bond.
+            Whether you're building your team locally or expanding internationally,<br></br> The Hires Lab is your trusted hub for all things HR, recruitment, and outsourcing.
             </p>
             <BtnSubmit name="Let's talk" type="text" onClick={() => {setIsModalOpen(true)
              console.log("test")}
@@ -33,30 +32,30 @@ export default function ServicesBenefits() {
               <ul className="w-auto space-y-3">
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  flexible subscription model
+                  Heart & Precision
                 </li>
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  50% cost saving vs agency model
+                  Speed & Efficiency
                 </li>
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  look and feel like your in-house team
+                  Scalable Solutions
                 </li>
               </ul>
 
               <ul className=" w-auto space-y-3">
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  onboard within days
+                  Global Reach
                 </li>
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  100% dedicated to you
+                  Beyond Recruitment
                 </li>
                 <li className="flex items-center gap-2 text-[1.1rem]">
                   <img src="/images/CheckIcon.svg" alt="Check icon" className="w-5 h-5" />
-                  embedded 5 days a week
+                  Proven Impact
                 </li>
               </ul>
             </div>

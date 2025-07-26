@@ -12,7 +12,7 @@ const WorkshopSection = () => {
        style={{ backgroundImage: `url('https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')` }}></div>
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8">
-          Check Out Our Workshops & Learning Programs
+           Join Our Workshops & Learning Tracks
         </h2>
         <Link
           href="#"
